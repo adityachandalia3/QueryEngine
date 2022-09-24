@@ -1,0 +1,344 @@
+{
+   "title": "four OR cases",
+   "input": {
+      "WHERE": {
+         "AND": [
+            {
+               "OR": [
+                  {
+                     "GT": {
+                        "sections_avg": 99
+                     }
+                  },
+                  {
+                     "IS": {
+                        "sections_dept": "adhe"
+                     }
+                  },
+                  {
+                     "IS": {
+                        "sections_id": "329"
+                     }
+                  },
+                  {
+                     "EQ": {
+                        "sections_avg": 5
+                     }
+                  }
+               ]
+            },
+            {
+               "IS": {
+                  "sections_title": "a*"
+               }
+            }
+         ]
+      },
+      "OPTIONS": {
+         "COLUMNS": [
+            "sections_dept",
+            "sections_id",
+            "sections_avg",
+            "sections_title"
+         ],
+         "ORDER": "sections_avg"
+      }
+   },
+   "errorExpected": false,
+   "expected": [
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 68.29,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 68.89,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 69.96,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 70.53,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 70.53,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 72.63,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 72.96,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 75.43,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 75.68,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 76.05,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 76.17,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 76.22,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 76.35,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 76.74,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 77.28,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 77.54,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 77.58,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 77.58,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 78,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 78.2,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 78.57,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 78.77,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 78.81,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 78.81,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 78.9,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 80.25,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 80.55,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 81.2,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 82.9,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 83.02,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 83.05,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 84.04,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 84.07,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 84.45,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 85.2,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 85.2,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 85.29,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 86.33,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 86.45,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 87.88,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 88.25,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 88.25,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 88.91,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 89.08,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 89.55,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 90.16,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_id": "412",
+         "sections_avg": 90.18,
+         "sections_title": "adul educ"
+      },
+      {
+         "sections_dept": "math",
+         "sections_id": "527",
+         "sections_avg": 99.78,
+         "sections_title": "algb topology i"
+      },
+      {
+         "sections_dept": "math",
+         "sections_id": "527",
+         "sections_avg": 99.78,
+         "sections_title": "algb topology i"
+      }
+   ]
+}

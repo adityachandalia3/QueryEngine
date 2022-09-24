@@ -1,0 +1,52 @@
+{
+   "title": "not and",
+   "input": {
+      "WHERE": {
+         "AND": [
+            {
+               "NOT": {
+                  "AND": [
+                     {
+                        "LT": {
+                           "sections_avg": 95
+                        }
+                     },
+                     {
+                        "GT": {
+                           "sections_avg": 68
+                        }
+                     }
+                  ]
+               }
+            },
+            {
+               "IS": {
+                  "sections_dept": "adhe"
+               }
+            }
+         ]
+      },
+      "OPTIONS": {
+         "COLUMNS": [
+            "sections_dept",
+            "sections_avg"
+         ],
+         "ORDER": "sections_avg"
+      }
+   },
+   "errorExpected": false,
+   "expected": [
+      {
+         "sections_dept": "adhe",
+         "sections_avg": 67.5
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_avg": 67.95
+      },
+      {
+         "sections_dept": "adhe",
+         "sections_avg": 96.11
+      }
+   ]
+}
