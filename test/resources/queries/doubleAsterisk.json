@@ -1,0 +1,66 @@
+{
+	"title": "doubleAsterisk",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"sections_title": "*d software p*"
+					}
+				},
+				{
+					"GT": {
+						"sections_avg": 88
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"sections_avg",
+				"sections_title"
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "cics",
+			"sections_id": "530",
+			"sections_avg": 88.68,
+			"sections_title": "ad software proj"
+		},
+		{
+			"sections_dept": "cics",
+			"sections_id": "530",
+			"sections_avg": 88.68,
+			"sections_title": "ad software proj"
+		},
+		{
+			"sections_dept": "cics",
+			"sections_id": "530",
+			"sections_avg": 88.52,
+			"sections_title": "ad software proj"
+		},
+		{
+			"sections_dept": "cics",
+			"sections_id": "530",
+			"sections_avg": 88.52,
+			"sections_title": "ad software proj"
+		},
+		{
+			"sections_dept": "cics",
+			"sections_id": "530",
+			"sections_avg": 89.68,
+			"sections_title": "ad software proj"
+		},
+		{
+			"sections_dept": "cics",
+			"sections_id": "530",
+			"sections_avg": 89.68,
+			"sections_title": "ad software proj"
+		}
+	]
+}

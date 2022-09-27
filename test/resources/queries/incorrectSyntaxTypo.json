@@ -1,0 +1,19 @@
+{
+    "title": "incorrect syntax query typo",
+    "input": {
+        "WHERE":{
+           "GT":{
+              "sections_avg":97
+           }
+        },
+        "OPTIONSSSSSSSSS":{
+           "COLUMNS":[
+              "sections_dept",
+              "sections_avg"
+           ],
+           "ORDER":"sections_avg"
+        }
+    },
+    "errorExpected": true,
+    "expected": "InsightError"
+  }

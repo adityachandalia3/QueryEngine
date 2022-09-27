@@ -1,0 +1,21 @@
+{
+    "title": "more than one eq",
+    "input": {
+        "WHERE": {
+          "EQ": {
+            "sections_pass": 97,
+              "sections_avg": 97
+          }
+        },
+        "OPTIONS": {
+          "COLUMNS": [
+            "sections_dept",
+            "sections_avg",
+            "sections_pass"
+          ],
+          "ORDER": "sections_dept"
+        }
+      },
+    "errorExpected": true,
+    "expected": "InsightError"
+  }

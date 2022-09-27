@@ -1,0 +1,109 @@
+{
+  "title": "unordered",
+  "input": {
+    "WHERE": {
+      "AND": [
+        {
+          "IS": {
+            "sections_title": "softwa*"
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "sections_dept",
+        "sections_id",
+        "sections_avg",
+        "sections_title"
+      ]
+    }
+  },
+  "errorExpected": false,
+  "expected": [
+    {
+      "sections_dept": "cpen",
+      "sections_id": "321",
+      "sections_avg": 80.87,
+      "sections_title": "software enginrn"
+    },
+    {
+      "sections_dept": "cpen",
+      "sections_id": "321",
+      "sections_avg": 80.87,
+      "sections_title": "software enginrn"
+    },
+    {
+      "sections_dept": "cpen",
+      "sections_id": "492",
+      "sections_avg": 85.92,
+      "sections_title": "software eng prj"
+    },
+    {
+      "sections_dept": "cpen",
+      "sections_id": "492",
+      "sections_avg": 85.92,
+      "sections_title": "software eng prj"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 91.79,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 91.79,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 82.5,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 82.5,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 89.17,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 89.17,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 89,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 89,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 84.75,
+      "sections_title": "software eng"
+    },
+    {
+      "sections_dept": "cpsc",
+      "sections_id": "507",
+      "sections_avg": 84.75,
+      "sections_title": "software eng"
+    }
+  ]
+}

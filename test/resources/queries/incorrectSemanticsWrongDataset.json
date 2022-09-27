@@ -1,0 +1,19 @@
+{
+    "title": "incorrect semantics query wrong dataset",
+    "input": {
+        "WHERE":{
+           "GT":{
+              "sections_avg":97
+           }
+        },
+        "OPTIONS":{
+           "COLUMNS":[
+              "INVALID_dept",
+              "INVALID_avg"
+           ],
+           "ORDER":"INVALID_avg"
+        }
+    },
+    "errorExpected": true,
+    "expected": "InsightError"
+  }

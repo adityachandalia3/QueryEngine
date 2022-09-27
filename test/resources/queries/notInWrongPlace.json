@@ -1,0 +1,21 @@
+{
+   "title": "NOT in wrong place",
+   "input": {
+      "WHERE": {
+         "GT": {
+            "NOT": {
+               "sections_avg": 50
+            }
+         }
+      },
+      "OPTIONS": {
+         "COLUMNS": [
+            "sections_dept",
+            "sections_avg"
+         ],
+         "ORDER": "sections_avg"
+      }
+   },
+   "errorExpected": true,
+   "expected": "InsightError"
+}
