@@ -1,10 +1,11 @@
+import Dataset from "./Dataset";
 import {
 	IInsightFacade,
 	InsightDataset,
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError
+	NotFoundError,
 } from "./IInsightFacade";
 
 /**
@@ -13,6 +14,15 @@ import {
  *
  */
 export default class InsightFacade implements IInsightFacade {
+	/**
+	 * currentDataset will be undefined until:
+	 * 1) addDataset from content
+	 * 2) performQuery loads dataset from disk
+	 *
+	 * performQuery must check if === undefined
+	 */
+	private currentDataset?: Dataset;
+
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
@@ -35,6 +45,8 @@ export default class InsightFacade implements IInsightFacade {
 
 	/**
 	 * Saves a dataset (stored in memory in the InsightDataset object) to disk as a JSON file.
+	 * Will update (or create if none) a metadata file mapping ids to file path
+	 *
 	 *
 	 * @param dataset  The dataset to be saved to disk.
 	 *
@@ -43,23 +55,24 @@ export default class InsightFacade implements IInsightFacade {
 	 * The promise should fulfill with the id of the saved dataset.
 	 * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
 	 */
-	private saveDataset(dataset: InsightDataset): Promise<string> {
+	private saveDataset(dataset: Dataset): Promise<string> {
 		// use fs.outputJson
 		return Promise.reject("Not implemented");
 	}
 
 	/**
-	 * Loads a dataset from disk to memory to the InsightDataset object.
+	 * Loads a dataset from disk to the Dataset object.
+	 * Searches for id in metadata file to find dataset.
 	 *
-	 * @param jsonData  The JSON data to be loaded from disk.
+	 * @param id  The id ofthe dataset to be loaded.
 	 *
 	 * @return Promise <string>
 	 *
 	 * The promise should fulfill with the id of the loaded dataset.
 	 * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
 	 */
-		 private loadDataset(jsonData: unknown): Promise<string> {
-			// use fs.readJson
-			return Promise.reject("Not implemented");
-		}
+	private loadDataset(id: string): Promise<string> {
+		// use fs.readJson
+		return Promise.reject("Not implemented");
+	}
 }
