@@ -52,11 +52,11 @@ export default class InsightFacade implements IInsightFacade {
 	/**
 	 *
 	 * Does the following:
-	 * 	1) gets session
-	 *  2) strips session & checks all match (new function?)
-	 *  3) parse data to function
-	 *  4) skeleton TODO: return a MAPPING for columns as well (new function?)
-	 *  5) skeleton TODO: ordering?
+	 * 1) gets session
+	 * 2) strips session & checks all match (new function?)
+	 * 3) parse data to function
+	 * 4) skeleton TODO: return a MAPPING for columns as well (new function?)
+	 * 5) skeleton TODO: ordering?
 	 *
 	 * @param query
 	 *
