@@ -15,11 +15,11 @@ import {
  */
 export default class InsightFacade implements IInsightFacade {
 	/**
-	 * currentDataset will be undefined until:
+	 * currentDataset will be undefined until either:
 	 * 1) addDataset from content
 	 * 2) performQuery loads dataset from disk
 	 *
-	 * performQuery must check if === undefined
+	 * performQuery must check if currentDataset === undefined
 	 */
 	private currentDataset?: Dataset;
 
@@ -64,7 +64,7 @@ export default class InsightFacade implements IInsightFacade {
 	 * Loads a dataset from disk to the Dataset object.
 	 * Searches for id in metadata file to find dataset.
 	 *
-	 * @param id  The id ofthe dataset to be loaded.
+	 * @param id  The id of the dataset to be loaded.
 	 *
 	 * @return Promise <string>
 	 *
