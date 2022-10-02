@@ -64,7 +64,6 @@ describe("InsightFacade", function () {
 			fs.removeSync(persistDirectory);
 		});
 		describe("Add Dataset", function () {
-
 			it("should list/contain 0 datasets initially", function () {
 				return facade.listDatasets().then((insightdatasets) => {
 					expect(insightdatasets).to.deep.equal([]);
@@ -134,13 +133,13 @@ describe("InsightFacade", function () {
 
 			it("should reject if dataset is not JSON", function () {
 				const content1 = getContentFromArchives("CPSC210.zip");
-				return expect(facade.addDataset("CPSC210", content1, InsightDatasetKind.Sections)).to.be
-					.rejectedWith(InsightError);
+				return expect(facade.addDataset("CPSC210", content1, InsightDatasetKind.Sections)).to.be.rejectedWith(
+					InsightError
+				);
 			});
 		});
 
 		describe("Remove Dataset", function () {
-
 			it("should reject if no datasets available", function () {
 				return expect(facade.removeDataset("sections")).eventually.to.be.rejectedWith(NotFoundError);
 			});

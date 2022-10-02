@@ -61,15 +61,14 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 
-
 	/**
-	 * 
+	 *
 	 * Return true if id is valid, false otherwise.
-	 * 
+	 *
 	 * @param id
-	 * 
+	 *
 	 * @returns boolean
-	 * 
+	 *
 	 */
 	private isValidId(id: string): boolean {
 		// TODO
