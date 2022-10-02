@@ -7,7 +7,9 @@ import {
 	InsightError,
 	InsightResult,
 	NotFoundError,
+	ResultTooLargeError,
 } from "./IInsightFacade";
+import {Query} from "./Query";
 import Section from "./Section";
 
 /**
@@ -37,12 +39,22 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 	public performQuery(query: unknown): Promise<InsightResult[]> {
-		let id,
-			filterFun = this.parseAndValidateQuery(query);
-		// TODO: check id is valid dataset ex) checkId(id)
-		// TODO: load dataset
-		let result: InsightResult[] = this.evaluateQuery();
-		return Promise.reject("Not implemented.");
+		let [id, queryString] = this.checkAndStripId(JSON.stringify(query).toLowerCase());
+		query = JSON.parse(queryString);
+
+		if (this.isQuery(query)) {
+			let filterFun = this.parseAndValidateQuery(query);
+			// TODO: check id is valid dataset ex) checkId(id)
+			return this.loadDataset(id).then(
+				() => this.evaluateQuery(filterFun),
+				(error) => {
+					return error;
+				}
+			);
+		} else {
+			// not a query
+			throw InsightError;
+		}
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
@@ -50,11 +62,37 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	/**
+	 * Returns id and query with id stripped.
+	 *
+	 * @param query
+	 * @returns [id, query]
+	 *
+	 * Will ??? if not all ids are the same.
+	 *
+	 */
+	private checkAndStripId(query: string): [string, string] {
+		let id = "";
+		const regex = /(?<=")[^"]*?_/g;
+		let matches = Array.from(query.matchAll(regex));
+
+		// check all ids are same
+		let valid = matches.every((match) => {
+			id = match[0];
+			return id === matches[0][0];
+		});
+
+		query = query.replaceAll(regex, "");
+		return [id, query];
+	}
+
+	private isQuery(query: unknown): query is Query {
+		return true;
+	}
+
+	/**
 	 *
 	 * Does the following:
-	 * 1) gets session
-	 * 2) strips session & checks all match (new function?)
-	 * 3) parse data to function
+	 * 3) parse data to Query.ts/function
 	 * 4) skeleton TODO: return a MAPPING for columns as well (new function?)
 	 * 5) skeleton TODO: ordering?
 	 *
@@ -62,30 +100,30 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 * @return [string, (s: Section) => boolean]
 	 *
-	 * Returns id of dataset to be queried and a filter/predicate function
+	 * Returns  filter/predicate function
 	 *
 	 */
-	private parseAndValidateQuery(query: unknown): [string, (s: Section) => boolean] {
+	private parseAndValidateQuery(query: Query): (s: Section) => boolean {
 		let id: string = "";
 
 		function filterFun(s: Section) {
 			return false;
 		}
 
-		return [id, filterFun];
+		return filterFun;
 	}
 
 	/**
 	 * Apply query to dataset and return result
 	 *
-	 * @param ...
+	 * @param filter, columns, order
 	 *
 	 *
 	 * @return InsightResult[]
 	 *
 	 * Will throw ResultTooLargeError if length > 5000
 	 */
-	private evaluateQuery(): InsightResult[] {
+	private evaluateQuery(filter: (s: Section) => boolean): InsightResult[] {
 		// iterate dataset
 		// if PREDICATE return mapped version (2 functions)
 		// newlist = list.filter(predicate)
