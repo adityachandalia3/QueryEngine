@@ -61,6 +61,21 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 
+
+	/**
+	 * 
+	 * Return true if id is valid, false otherwise.
+	 * 
+	 * @param id
+	 * 
+	 * @returns boolean
+	 * 
+	 */
+	private isValidId(id: string): boolean {
+		// TODO
+		return false;
+	}
+
 	/**
 	 * Returns id and query with id stripped.
 	 *
@@ -71,8 +86,9 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 */
 	private checkAndStripId(query: string): [string, string] {
+		console.log(query);
 		let id = "";
-		const regex = /(?<=")[^"]*?_/g;
+		const regex = /(?<=")[^"]*_/g; // will break if '_' is outside of " "
 		let matches = Array.from(query.matchAll(regex));
 
 		// check all ids are same
@@ -81,10 +97,16 @@ export default class InsightFacade implements IInsightFacade {
 			return id === matches[0][0];
 		});
 
+		valid = this.isValidId(id);
+
+		// TODO handle invalid case
+
+		// strip
 		query = query.replaceAll(regex, "");
 		return [id, query];
 	}
 
+	// TODO
 	private isQuery(query: unknown): query is Query {
 		return true;
 	}
