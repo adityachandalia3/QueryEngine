@@ -12,6 +12,7 @@ import * as fs from "fs-extra";
 import {folderTest} from "@ubccpsc310/folder-test";
 import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
+import {getContentFromArchives} from "../TestUtil";
 
 chai.use(chaiAsPromised);
 
@@ -63,6 +64,12 @@ describe("InsightFacade", function () {
 			fs.removeSync(persistDirectory);
 		});
 		describe("Add Dataset", function () {
+			it("should list/contain 0 datasets initially", function () {
+				return facade.listDatasets().then((insightdatasets) => {
+					expect(insightdatasets).to.deep.equal([]);
+				});
+			});
+
 			it("Should add a valid dataset", function () {
 				const id: string = "sections";
 				const expected: string[] = [id];
@@ -123,9 +130,20 @@ describe("InsightFacade", function () {
 
 				return expect(result).eventually.to.be.rejectedWith(InsightError);
 			});
+
+			it("should reject if dataset is not JSON", function () {
+				const content1 = getContentFromArchives("CPSC210.zip");
+				return expect(facade.addDataset("CPSC210", content1, InsightDatasetKind.Sections)).to.be.rejectedWith(
+					InsightError
+				);
+			});
 		});
 
 		describe("Remove Dataset", function () {
+			it("should reject if no datasets available", function () {
+				return expect(facade.removeDataset("sections")).eventually.to.be.rejectedWith(NotFoundError);
+			});
+
 			it("should remove a dataset", async function () {
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				let result = await facade.removeDataset("sections");
@@ -199,11 +217,6 @@ describe("InsightFacade", function () {
 					.then((addedIds) => {
 						expect(addedIds).to.deep.equal(["sections"]);
 					});
-			});
-
-			it("should reject removeDataset on empty list", function () {
-				let result = facade.removeDataset("sections");
-				return expect(result).eventually.to.be.rejectedWith(NotFoundError);
 			});
 
 			it("should reject dataset that has not been added yet", async function () {
