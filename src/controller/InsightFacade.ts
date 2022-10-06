@@ -11,6 +11,7 @@ import {
 } from "./IInsightFacade";
 import {Query} from "./Query";
 import Section from "./Section";
+import JSZip from "jszip";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -32,6 +33,16 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+
+		JSZip.loadAsync(content).then(function (zip){
+
+			if (zip.folder(/courses/).length > 0){
+				console.log("root directory validated!");
+			} else {
+				throw InsightError;
+				return Promise.reject("Root Directory is not courses");
+			}
+		});
 		return Promise.reject("Not implemented.");
 	}
 
@@ -186,4 +197,53 @@ export default class InsightFacade implements IInsightFacade {
 		// use fs.readJson
 		return Promise.reject("Not implemented");
 	}
+
+	// /**
+	//  *
+	//  * @param id The id of the dataset to be validates
+	//  * @param content The base64 content of the dataset. This content should be in the form of a serialized zip file.
+	//  * @param kind The kind of the dataset
+	//  *
+	//  * @return Promise <string>
+	//  *
+	//  * The promise should fulfill with the id of the validated dataset
+	//  * The promise should reject if the dataset is not valid describing the error
+	//  */
+
+// 	private async validatingDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string> {
+//
+// 		const JSZip = require("jszip");
+// 		const fs = require("fs");
+//
+//
+//
+// 		fs.readFile(content,
+// 			function (err: any, zip: string | number[] | Uint8Array | ArrayBuffer | Blob | NodeJS.ReadableStream) {
+// 			 JSZip.loadAsync(zip)
+// 				 .then(function (zip: { folder: (arg0: RegExp) => { (): any; new(): any; length: number; }; }) {
+// 					if(zip.folder(/courses/).length > 0) {
+//
+// 					} else {
+// 						return Promise.reject("Root Directory is not courses");
+// 					}
+//
+// 				})
+// 		})
+//
+// 		return Promise.reject("Not implemented completely")
+// 	}
+
+	/**
+	 * Checks/validates the id of the dataset that needs to be added according to the specification of addDataset
+	 *
+	 * @param id The id of the dataset that needs to be added
+	 * @private
+	 *
+	 * @return a number indicating the time of error
+	 */
+
+	private checkID(id: string):number {
+		return 1;
+	}
 }
+
