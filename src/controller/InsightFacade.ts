@@ -1,4 +1,3 @@
-import {stringify} from "querystring";
 import Dataset from "./Dataset";
 import {
 	IInsightFacade,
@@ -39,8 +38,13 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 	public performQuery(query: unknown): Promise<InsightResult[]> {
-		let [id, queryString] = this.checkAndStripId(JSON.stringify(query).toLowerCase());
-		query = JSON.parse(queryString);
+		let id, queryString;
+		try {
+			[id, queryString] = this.checkAndStripId(JSON.stringify(query).toLowerCase());
+			query = JSON.parse(queryString);
+		} catch (err) {
+			return Promise.reject(err);
+		}
 
 		if (this.isQuery(query)) {
 			let filterFun = this.parseAndValidateQuery(query);
@@ -52,8 +56,7 @@ export default class InsightFacade implements IInsightFacade {
 				}
 			);
 		} else {
-			// not a query
-			throw InsightError;
+			return Promise.reject(new InsightError("query given is not a valid query"));
 		}
 	}
 
@@ -71,8 +74,16 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 */
 	private isValidId(id: string): boolean {
-		// TODO
-		return false;
+		if (id.includes("_")) {
+			return false;
+		};
+		if (id.length === 0) {
+			return false;
+		}
+		if (!id.trim()) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -85,22 +96,22 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 */
 	private checkAndStripId(query: string): [string, string] {
-		console.log(query);
 		let id = "";
-		const regex = /(?<=")[^"]*_/g; // will break if '_' is outside of " "
+		const regex = /(?<=")[^"]*_/g; // will break if an underscore is outside of quotes
 		let matches = Array.from(query.matchAll(regex));
 
-		// check all ids are same
-		let valid = matches.every((match) => {
+		let idsAllMatch = matches.every((match) => {
 			id = match[0];
 			return id === matches[0][0];
 		});
 
-		valid = this.isValidId(id);
+		if (!idsAllMatch) {
+			throw new InsightError("not all ids match");
+		}
+		if (!this.isValidId(id)) {
+			throw new InsightError("id is not valid");
+		}
 
-		// TODO handle invalid case
-
-		// strip
 		query = query.replaceAll(regex, "");
 		return [id, query];
 	}
