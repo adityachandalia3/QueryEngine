@@ -11,6 +11,4 @@ describe("PerformQueryUnitTests", function () {
 	beforeEach(function () {
 		facade = new InsightFacade();
 	});
-
-
 });

@@ -8,7 +8,7 @@ import {
 	NotFoundError,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import {Query} from "./Query";
+import {Filter, Query, Mkey, Skey} from "./Query";
 import Section from "./Section";
 
 /**
@@ -37,18 +37,27 @@ export default class InsightFacade implements IInsightFacade {
 	public removeDataset(id: string): Promise<string> {
 		return Promise.reject("Not implemented.");
 	}
+
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		let id, queryString;
+
 		try {
 			[id, queryString] = this.checkAndStripId(JSON.stringify(query).toLowerCase());
-			query = JSON.parse(queryString);
 		} catch (err) {
+			console.log((err as Error).message);
 			return Promise.reject(err);
 		}
 
+		query = JSON.parse(queryString);
+
 		if (this.isQuery(query)) {
-			let filterFun = this.parseAndValidateQuery(query);
-			// TODO: check id is valid dataset ex) checkId(id)
+			let filterFun: (s: Section) => boolean;
+			try {
+				filterFun = this.validateQuery(query);
+			} catch (err) {
+				console.log((err as Error).message);
+				return Promise.reject(err);
+			}
 			return this.loadDataset(id).then(
 				() => this.evaluateQuery(filterFun),
 				(error) => {
@@ -56,6 +65,7 @@ export default class InsightFacade implements IInsightFacade {
 				}
 			);
 		} else {
+			console.log("not a valid query");
 			return Promise.reject(new InsightError("query given is not a valid query"));
 		}
 	}
@@ -65,34 +75,12 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	/**
-	 *
-	 * Return true if id is valid, false otherwise.
-	 *
-	 * @param id
-	 *
-	 * @returns boolean
-	 *
-	 */
-	private isValidId(id: string): boolean {
-		if (id.includes("_")) {
-			return false;
-		};
-		if (id.length === 0) {
-			return false;
-		}
-		if (!id.trim()) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
 	 * Returns id and query with id stripped.
 	 *
 	 * @param query
 	 * @returns [id, query]
 	 *
-	 * Will ??? if not all ids are the same.
+	 * Will throw InsightError if id is invalid.
 	 *
 	 */
 	private checkAndStripId(query: string): [string, string] {
@@ -108,6 +96,9 @@ export default class InsightFacade implements IInsightFacade {
 		if (!idsAllMatch) {
 			throw new InsightError("not all ids match");
 		}
+
+		id = id.slice(0, -1);
+
 		if (!this.isValidId(id)) {
 			throw new InsightError("id is not valid");
 		}
@@ -116,15 +107,9 @@ export default class InsightFacade implements IInsightFacade {
 		return [id, query];
 	}
 
-	// TODO
-	private isQuery(query: unknown): query is Query {
-		return true;
-	}
-
 	/**
 	 *
 	 * Does the following:
-	 * 3) parse data to Query.ts/function
 	 * 4) skeleton TODO: return a MAPPING for columns as well (new function?)
 	 * 5) skeleton TODO: ordering?
 	 *
@@ -135,14 +120,47 @@ export default class InsightFacade implements IInsightFacade {
 	 * Returns  filter/predicate function
 	 *
 	 */
-	private parseAndValidateQuery(query: Query): (s: Section) => boolean {
-		let id: string = "";
+	private validateQuery(query: Query): (s: Section) => boolean {
 
+		// validate WHERE
+
+		if (Object.values(query.where).length === 1) {
+			this.validateFilter(query.where);
+		} else if (Object.values(query.where).length > 1) {
+			throw new InsightError("WHERE should only have 1 key");
+		}
+
+		// validate OPTIONS
+
+		if (query.options.columns.length === 0) {
+			throw new InsightError("COLUMNS must be a non-empty array");
+		}
+
+		for (const i in query.options.columns) {
+			if (!this.isKey(query.options.columns[i])) {
+				throw new InsightError("Invalid key in COLUMNS");
+			}
+		}
+
+		if (query.options.order !== undefined) {
+			if (!this.isKey(query.options.order)) {
+				throw new InsightError("Invalid ORDER type");
+			}
+			if (!query.options.columns.includes(query.options.order as unknown as string)) {
+				throw new InsightError("ORDER key must be in COLUMNS");
+			}
+		}
+
+		// probably delete this
 		function filterFun(s: Section) {
 			return false;
 		}
 
 		return filterFun;
+	}
+
+	private validateFilter(filter: Filter) {
+		throw new InsightError("where validation not implemented yet");
 	}
 
 	/**
@@ -163,6 +181,55 @@ export default class InsightFacade implements IInsightFacade {
 		// map(callbackFn)
 		// sort
 		return [];
+	}
+
+	private isQuery(query: unknown): query is Query {
+		return (
+			query !== null &&
+			query !== undefined &&
+			typeof query === "object" &&
+			(query as Query).where !== undefined &&
+			(query as Query).options !== undefined
+		);
+	}
+
+	private isKey(key: unknown): key is Mkey | Skey {
+		return (
+			key !== null &&
+			key !== undefined &&
+			((key as unknown as string) === "avg" ||
+				(key as unknown as string) === "pass" ||
+				(key as unknown as string) === "fail" ||
+				(key as unknown as string) === "audit" ||
+				(key as unknown as string) === "year" ||
+				(key as unknown as string) === "dept" ||
+				(key as unknown as string) === "id" ||
+				(key as unknown as string) === "instructor" ||
+				(key as unknown as string) === "title" ||
+				(key as unknown as string) === "uuid")
+		);
+	}
+
+	/**
+	 *
+	 * Return true if id is valid, false otherwise.
+	 *
+	 * @param id
+	 *
+	 * @returns boolean
+	 *
+	 */
+	private isValidId(id: string): boolean {
+		if (id.includes("_")) {
+			return false;
+		}
+		if (id.length === 0) {
+			return false;
+		}
+		if (!id.trim()) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
