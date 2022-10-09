@@ -103,6 +103,18 @@ export function validateOptions(query: Query) {
 		throw new InsightError("COLUMNS must be a non-empty array");
 	}
 
+	for (const k of Object.keys(query)) {
+		if (k !== "WHERE" && k !== "OPTIONS") {
+			throw new InsightError("Invalid keys in query");
+		}
+	}
+
+	for (const k of Object.keys(query.OPTIONS)) {
+		if (k !== "COLUMNS" && k !== "ORDER") {
+			throw new InsightError("Invalid keys in OPTIONS");
+		}
+	}
+
 	for (const i in query.OPTIONS.COLUMNS) {
 		if (!isField(query.OPTIONS.COLUMNS[i])) {
 			throw new InsightError("Invalid key in COLUMNS");
