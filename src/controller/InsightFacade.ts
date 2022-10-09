@@ -8,9 +8,11 @@ import {
 	NotFoundError,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import {Query} from "./Query";
+import {Filter, Query, Mkey, Skey} from "./Query";
 import Section from "./Section";
 import JSZip from "jszip";
+import * as pq from "./PerformQuery";
+import {loadDataset} from "./Helpers";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -48,165 +50,38 @@ export default class InsightFacade implements IInsightFacade {
 	public removeDataset(id: string): Promise<string> {
 		return Promise.reject("Not implemented.");
 	}
+
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		let id, queryString;
+
 		try {
-			[id, queryString] = this.checkAndStripId(JSON.stringify(query).toLowerCase());
-			query = JSON.parse(queryString);
+			[id, queryString] = pq.checkAndStripId(JSON.stringify(query));
 		} catch (err) {
+			console.log((err as Error).message);
 			return Promise.reject(err);
 		}
+		query = JSON.parse(queryString);
 
-		if (this.isQuery(query)) {
-			let filterFun = this.parseAndValidateQuery(query);
-			// TODO: check id is valid dataset ex) checkId(id)
-			return this.loadDataset(id).then(
-				() => this.evaluateQuery(filterFun),
+		if (pq.isQuery(query)) {
+			try {
+				pq.validateQuery(query);
+			} catch (err) {
+				console.log((err as Error).message);
+				return Promise.reject(err);
+			}
+			return loadDataset(id).then(
+				() => pq.evaluateQuery(),
 				(error) => {
 					return error;
 				}
 			);
 		} else {
-			return Promise.reject(new InsightError("query given is not a valid query"));
+			return Promise.reject(new InsightError("Query given is not a valid query"));
 		}
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
-	}
-
-	/**
-	 *
-	 * Return true if id is valid, false otherwise.
-	 *
-	 * @param id
-	 *
-	 * @returns boolean
-	 *
-	 */
-	private isValidId(id: string): boolean {
-		if (id.includes("_")) {
-			return false;
-		};
-		if (id.length === 0) {
-			return false;
-		}
-		if (!id.trim()) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Returns id and query with id stripped.
-	 *
-	 * @param query
-	 * @returns [id, query]
-	 *
-	 * Will ??? if not all ids are the same.
-	 *
-	 */
-	private checkAndStripId(query: string): [string, string] {
-		let id = "";
-		const regex = /(?<=")[^"]*_/g; // will break if an underscore is outside of quotes
-		let matches = Array.from(query.matchAll(regex));
-
-		let idsAllMatch = matches.every((match) => {
-			id = match[0];
-			return id === matches[0][0];
-		});
-
-		if (!idsAllMatch) {
-			throw new InsightError("not all ids match");
-		}
-		if (!this.isValidId(id)) {
-			throw new InsightError("id is not valid");
-		}
-
-		query = query.replaceAll(regex, "");
-		return [id, query];
-	}
-
-	// TODO
-	private isQuery(query: unknown): query is Query {
-		return true;
-	}
-
-	/**
-	 *
-	 * Does the following:
-	 * 3) parse data to Query.ts/function
-	 * 4) skeleton TODO: return a MAPPING for columns as well (new function?)
-	 * 5) skeleton TODO: ordering?
-	 *
-	 * @param query
-	 *
-	 * @return [string, (s: Section) => boolean]
-	 *
-	 * Returns  filter/predicate function
-	 *
-	 */
-	private parseAndValidateQuery(query: Query): (s: Section) => boolean {
-		let id: string = "";
-
-		function filterFun(s: Section) {
-			return false;
-		}
-
-		return filterFun;
-	}
-
-	/**
-	 * Apply query to dataset and return result
-	 *
-	 * @param filter, columns, order
-	 *
-	 *
-	 * @return InsightResult[]
-	 *
-	 * Will throw ResultTooLargeError if length > 5000
-	 */
-	private evaluateQuery(filter: (s: Section) => boolean): InsightResult[] {
-		// iterate dataset
-		// if PREDICATE return mapped version (2 functions)
-		// newlist = list.filter(predicate)
-		// check length (in filter?)
-		// map(callbackFn)
-		// sort
-		return [];
-	}
-
-	/**
-	 * Saves a dataset (stored in memory in the InsightDataset object) to disk as a JSON file.
-	 * Will update (or create if none) a metadata file mapping ids to file path
-	 *
-	 *
-	 * @param dataset  The dataset to be saved to disk.
-	 *
-	 * @return Promise <string>
-	 *
-	 * The promise should fulfill with the id of the saved dataset.
-	 * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
-	 */
-	private saveDataset(dataset: Dataset): Promise<string> {
-		// use fs.outputJson
-		return Promise.reject("Not implemented");
-	}
-
-	/**
-	 * Loads a dataset from disk to the Dataset object.
-	 * Searches for id in metadata file to find dataset.
-	 *
-	 * @param id  The id of the dataset to be loaded.
-	 *
-	 * @return Promise <string>
-	 *
-	 * The promise should fulfill with the id of the loaded dataset.
-	 * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
-	 */
-	private loadDataset(id: string): Promise<string> {
-		// use fs.readJson
-		return Promise.reject("Not implemented");
 	}
 
 	// /**
@@ -253,8 +128,7 @@ export default class InsightFacade implements IInsightFacade {
 	 * @return a number indicating the time of error
 	 */
 
-	private checkID(id: string):number {
+	private checkID(id: string): number {
 		return 1;
 	}
 }
-

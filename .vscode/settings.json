@@ -15,5 +15,6 @@
                 "/test/queries/**"
             ]
         }
-    ]
+    ],
+    "editor.insertSpaces": false
 }
