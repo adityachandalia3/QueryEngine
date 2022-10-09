@@ -1,19 +1,19 @@
 export interface Query {
-	where: Filter;
-	options: {
-		columns: string[]; // check later at least one
-		order?: Mkey | Skey; // check later order is in column
+	WHERE: Filter;
+	OPTIONS: {
+		COLUMNS: string[];
+		ORDER?: string;
 	};
 }
 
 export interface Filter {
-	and: Filter[];
-	or: Filter[];
-	lt: Mkey;
-	gt: Mkey;
-	eq: Mkey;
-	is: Skey;
-	not: Filter;
+	AND: Filter[];
+	OR: Filter[];
+	LT: Mkey;
+	GT: Mkey;
+	EQ: Mkey;
+	IS: Skey;
+	NOT: Filter;
 }
 
 export interface Mkey {
