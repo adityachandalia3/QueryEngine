@@ -21,6 +21,18 @@ export function isValidId(id: string): boolean {
 	}
 	return true;
 }
+/**
+ * 
+ * Returns true if id is id of an added dataset, false otherwise.
+ * 
+ * @param id 
+ * @returns boolean
+ * 
+ */
+export function containsId(id: string): boolean {
+	// TODO
+	return false;
+}
 
 /**
  * Saves a dataset (stored in memory in the InsightDataset object) to disk as a JSON file.

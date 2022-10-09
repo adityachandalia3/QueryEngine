@@ -12,7 +12,7 @@ import {Filter, Query, Mkey, Skey} from "./Query";
 import Section from "./Section";
 import JSZip from "jszip";
 import * as pq from "./PerformQuery";
-import {loadDataset} from "./Helpers";
+import {containsId, isValidId, loadDataset} from "./Helpers";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -35,16 +35,22 @@ export default class InsightFacade implements IInsightFacade {
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 
-		JSZip.loadAsync(content).then(function (zip){
+		if (!isValidId(id)) {
+			return Promise.reject(new InsightError("id is not valid"));
+		}
 
+		if (containsId(id)) {
+			return Promise.reject(new InsightError("dataset with same id has already been added"));
+		}
+
+		return JSZip.loadAsync(content, {base64: true}).then(function (zip){
 			if (zip.folder(/courses/).length > 0){
 				console.log("root directory validated!");
 			} else {
-				throw InsightError;
-				return Promise.reject("Root Directory is not courses");
+				return Promise.reject(new InsightError("Root directory is not courses"));
 			}
+			return Promise.reject("");
 		});
-		return Promise.reject("Not implemented.");
 	}
 
 	public removeDataset(id: string): Promise<string> {
@@ -118,17 +124,4 @@ export default class InsightFacade implements IInsightFacade {
 //
 // 		return Promise.reject("Not implemented completely")
 // 	}
-
-	/**
-	 * Checks/validates the id of the dataset that needs to be added according to the specification of addDataset
-	 *
-	 * @param id The id of the dataset that needs to be added
-	 * @private
-	 *
-	 * @return a number indicating the time of error
-	 */
-
-	private checkID(id: string): number {
-		return 1;
-	}
 }
