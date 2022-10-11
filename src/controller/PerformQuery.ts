@@ -1,3 +1,4 @@
+import {Dataset} from "./Dataset";
 import {isValidId} from "./Helpers";
 import {InsightError, InsightResult} from "./IInsightFacade";
 import {Filter, Mkey, Query, Skey} from "./Query";
@@ -141,7 +142,7 @@ export function validateOptions(query: Query) {
  *
  * Will throw ResultTooLargeError if length > 5000
  */
-export function evaluateQuery(): InsightResult[] {
+export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	// iterate dataset
 	// if PREDICATE return mapped version (2 functions)
 	// newlist = list.filter(predicate)

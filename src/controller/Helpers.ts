@@ -59,7 +59,7 @@ export function saveDataset(dataset: Dataset): Promise<string> {
  * The promise should fulfill with the id of the loaded dataset.
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
-export function loadDataset(id: string): Promise<string> {
+export function loadDataset(dataset: Dataset | null, id: string): Promise<string> {
 	// use fs.readJson
 	return Promise.reject("Not implemented");
 }

@@ -94,6 +94,11 @@ export default class InsightFacade implements IInsightFacade {
 			console.log((err as Error).message);
 			return Promise.reject(err);
 		}
+
+		if (!containsId(id)) {
+			return Promise.reject(new InsightError("id of dataset to perform query on does not exist"));
+		}
+
 		query = JSON.parse(queryString);
 
 		if (PQ.isQuery(query)) {
@@ -103,8 +108,8 @@ export default class InsightFacade implements IInsightFacade {
 				console.log((err as Error).message);
 				return Promise.reject(err);
 			}
-			return loadDataset(id).then(
-				() => PQ.evaluateQuery(),
+			return loadDataset(this.currentDataset, id).then(
+				() => PQ.evaluateQuery(this.currentDataset as Dataset, query as Query),
 				(error) => {
 					return error;
 				}
