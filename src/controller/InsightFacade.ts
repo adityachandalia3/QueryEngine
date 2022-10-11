@@ -44,7 +44,7 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("dataset with same id has already been added"));
 		}
 
-		return JSZip.loadAsync(content, {base64: true}).then(function (zip) {
+		return JSZip.loadAsync(content, {base64: true}).then((zip) => {
 			if (zip.folder("courses") === null) {
 				return Promise.reject(new InsightError("No directory named courses"));
 			} else {
@@ -62,7 +62,7 @@ export default class InsightFacade implements IInsightFacade {
 					content: await promise
 				});
 			});
-			return Promise.all(promises).then(async function(this: any) {
+			return Promise.all(promises).then(async () => {
 				let sections: Section[] = [];
 
 				for (const zc of zipContent) {
@@ -74,8 +74,7 @@ export default class InsightFacade implements IInsightFacade {
 						sections = sections.concat(AD.resultsToSections(results));
 					}
 				}
-				// this.currentDataset = new Dataset(id, kind, sections.length, sections);
-				// TypeError: Cannot set properties of undefined (setting 'currentDataset')
+				this.currentDataset = new Dataset(id, kind, sections.length, sections);
 			});
 		}).then(() => {
 			return Promise.resolve(["TODO"]);
