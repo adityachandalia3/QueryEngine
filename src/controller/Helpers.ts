@@ -1,4 +1,4 @@
-import Dataset from "./Dataset";
+import {Dataset} from "./Dataset";
 
 /**
  *
@@ -27,6 +27,7 @@ export function isValidId(id: string): boolean {
  * @returns boolean
  */
 export function containsId(id: string): boolean {
+	// TODO
 	return false;
 }
 
