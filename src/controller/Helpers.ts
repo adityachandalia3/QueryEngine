@@ -1,4 +1,5 @@
 import Dataset from "./Dataset";
+import exp from "constants";
 
 /**
  *
@@ -22,15 +23,11 @@ export function isValidId(id: string): boolean {
 	return true;
 }
 /**
- * 
  * Returns true if id is id of an added dataset, false otherwise.
- * 
- * @param id 
+ * @param id
  * @returns boolean
- * 
  */
 export function containsId(id: string): boolean {
-	// TODO
 	return false;
 }
 
@@ -66,3 +63,15 @@ export function loadDataset(id: string): Promise<string> {
 	// use fs.readJson
 	return Promise.reject("Not implemented");
 }
+
+// export function JSONParsing(file: string): Promise<any[]>{
+// 		let parsing =  JSON.parse(file)4
+// 		let parsed: any[] = [];
+//
+// 		for(let i in parsing){
+// 			parsed.push(parsing[i]);
+// 		}
+//
+// 		return Promise.resolve(parsed);
+//
+// }

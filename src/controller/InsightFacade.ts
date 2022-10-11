@@ -43,13 +43,39 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("dataset with same id has already been added"));
 		}
 
-		return JSZip.loadAsync(content, {base64: true}).then(function (zip){
-			if (zip.folder(/courses/).length > 0){
+		return JSZip.loadAsync(content, {base64: true}).then(function (zip) {
+			if (zip.folder(/courses/).length > 0) {
 				console.log("root directory validated!");
 			} else {
 				return Promise.reject(new InsightError("Root directory is not courses"));
 			}
-			return Promise.reject("");
+			const zipContent: any[] = [];
+			const promises: any[] = [];
+			let parsed: any[] = [];
+			let num = 0;
+			zip.forEach(async (relativePath, file) => {
+				const promise = file.async("string");
+				promises.push(promise);
+				zipContent.push({
+					file: relativePath,
+					content: await promise
+				});
+			});
+			Promise.all(promises).then(async () => {
+
+				for (let i = 0; i < zipContent.length; i++) {
+					try {
+						let parsing = JSON.parse(zipContent[i].content);
+						parsed[i] = parsing;
+					} catch (e) {
+						console.log(e);
+					}
+				}
+				console.log(parsed);
+
+
+			});
+			return Promise.reject("blah");
 		});
 	}
 
@@ -90,38 +116,4 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 
-	// /**
-	//  *
-	//  * @param id The id of the dataset to be validates
-	//  * @param content The base64 content of the dataset. This content should be in the form of a serialized zip file.
-	//  * @param kind The kind of the dataset
-	//  *
-	//  * @return Promise <string>
-	//  *
-	//  * The promise should fulfill with the id of the validated dataset
-	//  * The promise should reject if the dataset is not valid describing the error
-	//  */
-
-// 	private async validatingDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string> {
-//
-// 		const JSZip = require("jszip");
-// 		const fs = require("fs");
-//
-//
-//
-// 		fs.readFile(content,
-// 			function (err: any, zip: string | number[] | Uint8Array | ArrayBuffer | Blob | NodeJS.ReadableStream) {
-// 			 JSZip.loadAsync(zip)
-// 				 .then(function (zip: { folder: (arg0: RegExp) => { (): any; new(): any; length: number; }; }) {
-// 					if(zip.folder(/courses/).length > 0) {
-//
-// 					} else {
-// 						return Promise.reject("Root Directory is not courses");
-// 					}
-//
-// 				})
-// 		})
-//
-// 		return Promise.reject("Not implemented completely")
-// 	}
 }
