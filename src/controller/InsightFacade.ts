@@ -28,12 +28,10 @@ export default class InsightFacade implements IInsightFacade {
 	 * performQuery must check if currentDataset === undefined
 	 */
 	private currentDataset: Dataset | null;
-	private a: number;
 
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 		this.currentDataset = null;
-		this.a = 1;
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
