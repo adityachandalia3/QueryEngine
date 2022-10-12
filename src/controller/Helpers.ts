@@ -1,4 +1,6 @@
 import {Dataset} from "./Dataset";
+import * as fs from "fs-extra";
+import {InsightError} from "./IInsightFacade";
 
 /**
  *
@@ -35,8 +37,13 @@ export function isValidId(id: string): boolean {
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
 export function saveDataset(dataset: Dataset): Promise<string> {
-	// use fs.outputJson
-	return Promise.reject("Not implemented");
+	try {
+		return fs.outputJson("project_team104/data", dataset).then(() => {
+			return Promise.resolve(dataset.id);
+		})
+	} catch {
+		return Promise.reject(new InsightError("Unable to save file"));
+	}
 }
 
 /**
@@ -55,14 +62,3 @@ export function loadDataset(id: string): Promise<string> {
 	return Promise.reject("Not implemented");
 }
 
-// export function JSONParsing(file: string): Promise<any[]>{
-// 		let parsing =  JSON.parse(file)4
-// 		let parsed: any[] = [];
-//
-// 		for(let i in parsing){
-// 			parsed.push(parsing[i]);
-// 		}
-//
-// 		return Promise.resolve(parsed);
-//
-// }

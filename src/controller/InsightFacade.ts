@@ -2,7 +2,7 @@ import {Dataset, Section} from "./Dataset";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult,} from "./IInsightFacade";
 import JSZip from "jszip";
 import * as PQ from "./PerformQuery";
-import {isValidId, loadDataset} from "./Helpers";
+import {isValidId, loadDataset, saveDataset} from "./Helpers";
 import * as AD from "./AddDatset";
 
 /**
@@ -29,26 +29,21 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-
 		if (!isValidId(id)) {
 			return Promise.reject(new InsightError("id is not valid"));
 		}
-
 		if (this.currentIds.includes(id)) {
 			return Promise.reject(new InsightError("dataset with same id has already been added"));
 		}
-
 		if(kind === InsightDatasetKind.Rooms){
-			return Promise.reject(new InsightError("Dataset of Rooms not allowed!"))
+			return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
 		}
-
 		return JSZip.loadAsync(content, {base64: true}).then((zip) => {
-			if (zip.folder("courses") === null) {
+			if (zip.folder("courses") === null){
 				return Promise.reject(new InsightError("No directory named courses"));
 			} else {
 				zip = zip.folder("courses") as JSZip;
 			}
-
 			const zipContent: any[] = [];
 			const promises: any[] = [];
 
@@ -72,15 +67,13 @@ export default class InsightFacade implements IInsightFacade {
 						sections = sections.concat(AD.resultsToSections(results));
 					}
 				}
-
 				this.currentDataset = new Dataset(id, kind, sections.length, sections);
-
-				if(sections.length<1){
+				await saveDataset(this.currentDataset);
+				if(sections.length < 1){
 					return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
 				}
 				this.currentIds.push(id);
-				console.log(this.currentIds)
-
+				console.log(this.currentIds);
 			});
 		}).then(() => {
 			return Promise.resolve(this.currentIds);
