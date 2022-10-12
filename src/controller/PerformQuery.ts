@@ -55,7 +55,6 @@ export function validateQuery(query: Query) {
 }
 
 export function validateFilter(filter: Filter) {
-	console.log(filter);
 	if (Object.values(filter).length !== 1) {
 		throw new InsightError("Should only have 1 key, has " + Object.values(filter).length);
 	}

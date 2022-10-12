@@ -1,4 +1,5 @@
 import {Dataset} from "./Dataset";
+import { InsightError } from "./IInsightFacade";
 
 /**
  *
@@ -60,6 +61,13 @@ export function saveDataset(dataset: Dataset): Promise<string> {
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
 export function loadDataset(dataset: Dataset | null, id: string): Promise<string> {
+	if (dataset !== null && dataset.id === id) {
+		return Promise.resolve(id);
+	}
+	if (!containsId(id)) {
+		throw new InsightError("dataset with given id does not exist");
+	}
+
 	// use fs.readJson
 	return Promise.reject("Not implemented");
 }

@@ -95,10 +95,6 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(err);
 		}
 
-		if (!containsId(id)) {
-			return Promise.reject(new InsightError("id of dataset to perform query on does not exist"));
-		}
-
 		query = JSON.parse(queryString);
 
 		if (PQ.isQuery(query)) {
