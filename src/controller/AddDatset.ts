@@ -24,6 +24,36 @@ export function resultsToSections(results: Result[]): Section[] {
 		if (result.Section === "overall") {
 			result.Year = 1900;
 		}
+		if (result.Subject === undefined) {
+			continue;
+		}
+		if (result.Course === undefined){
+			continue;
+		}
+		if (result.Professor === undefined){
+			continue;
+		}
+		if (result.Title === undefined){
+			continue;
+		}
+		if (result.id === undefined){
+			continue;
+		}
+		if (result.Avg === undefined){
+			continue;
+		}
+		if (result.Pass === undefined){
+			continue;
+		}
+		if (result.Fail === undefined){
+			continue;
+		}
+		if (result.Audit === undefined){
+			continue;
+		}
+		if (result.Year === undefined){
+			continue;
+		}
 		sections.push({dept: result.Subject,
 			id: result.Course,
 			instructor: result.Professor,
@@ -36,6 +66,5 @@ export function resultsToSections(results: Result[]): Section[] {
 			year: result.Year
 		});
 	}
-
 	return sections;
 }

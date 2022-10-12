@@ -1,17 +1,8 @@
 import {Dataset, Section} from "./Dataset";
-import {
-	IInsightFacade,
-	InsightDataset,
-	InsightDatasetKind,
-	InsightError,
-	InsightResult,
-	NotFoundError,
-	ResultTooLargeError,
-} from "./IInsightFacade";
-import {Filter, Query, Mkey, Skey} from "./Query";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult,} from "./IInsightFacade";
 import JSZip from "jszip";
 import * as PQ from "./PerformQuery";
-import {containsId, isValidId, loadDataset} from "./Helpers";
+import {isValidId, loadDataset} from "./Helpers";
 import * as AD from "./AddDatset";
 
 /**
@@ -28,10 +19,13 @@ export default class InsightFacade implements IInsightFacade {
 	 * performQuery must check if currentDataset === undefined
 	 */
 	private currentDataset: Dataset | null;
+	private currentIds: string[];
 
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 		this.currentDataset = null;
+		this.currentIds = [];
+
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -40,8 +34,12 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("id is not valid"));
 		}
 
-		if (containsId(id)) {
+		if (this.currentIds.includes(id)) {
 			return Promise.reject(new InsightError("dataset with same id has already been added"));
+		}
+
+		if(kind === InsightDatasetKind.Rooms){
+			return Promise.reject(new InsightError("Dataset of Rooms not allowed!"))
 		}
 
 		return JSZip.loadAsync(content, {base64: true}).then((zip) => {
@@ -74,11 +72,19 @@ export default class InsightFacade implements IInsightFacade {
 						sections = sections.concat(AD.resultsToSections(results));
 					}
 				}
+
 				this.currentDataset = new Dataset(id, kind, sections.length, sections);
+
+				if(sections.length<1){
+					return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
+				}
+				this.currentIds.push(id);
+				console.log(this.currentIds)
+
 			});
 		}).then(() => {
-			return Promise.resolve(["TODO"]);
-		});;
+			return Promise.resolve(this.currentIds);
+		});
 	}
 
 	public removeDataset(id: string): Promise<string> {

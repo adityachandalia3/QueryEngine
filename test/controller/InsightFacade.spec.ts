@@ -71,6 +71,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("Should add a valid dataset", function () {
+				this.timeout(10000)
 				const id: string = "sections";
 				const expected: string[] = [id];
 				return facade
@@ -79,6 +80,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should add two datasets", function () {
+				this.timeout(10000)
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
 					.then((addedIds) => {
@@ -92,12 +94,14 @@ describe("InsightFacade", function () {
 			});
 
 			it("should add dataset with id with whitespace", function () {
+				this.timeout(10000)
 				return facade.addDataset("sections 1", content, InsightDatasetKind.Sections).then((addedIds) => {
 					expect(addedIds).to.deep.equal(["sections 1"]);
 				});
 			});
 
 			it("should reject two datasets of same id", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				try {
 					await facade.addDataset("sections", content, InsightDatasetKind.Sections);
