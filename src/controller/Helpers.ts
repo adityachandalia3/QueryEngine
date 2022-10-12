@@ -1,5 +1,5 @@
 import {Dataset} from "./Dataset";
-import { InsightError } from "./IInsightFacade";
+import {InsightError} from "./IInsightFacade";
 
 /**
  *
