@@ -8,11 +8,12 @@ import {
 	NotFoundError,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import {Filter, Query, Mkey, Skey} from "./Query";
+import {Filter, Query, Mkey, Skey} from "./PerformQuery/Query";
 import JSZip from "jszip";
-import * as PQ from "./PerformQuery";
+import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation";
 import {containsId, isValidId, loadDataset} from "./Helpers";
 import * as AD from "./AddDatset";
+import {evaluateQuery} from "./PerformQuery/Evaluation";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -89,7 +90,7 @@ export default class InsightFacade implements IInsightFacade {
 		let id, queryString;
 
 		try {
-			[id, queryString] = PQ.checkAndStripId(JSON.stringify(query));
+			[id, queryString] = checkAndStripId(JSON.stringify(query));
 		} catch (err) {
 			console.log((err as Error).message);
 			return Promise.reject(err);
@@ -97,17 +98,17 @@ export default class InsightFacade implements IInsightFacade {
 
 		query = JSON.parse(queryString);
 
-		if (PQ.isQuery(query)) {
+		if (isQuery(query)) {
 			try {
-				PQ.validateQuery(query);
+				validateQuery(query);
 			} catch (err) {
 				console.log((err as Error).message);
 				return Promise.reject(err);
 			}
 			return loadDataset(this.currentDataset, id).then(
-				() => PQ.evaluateQuery(this.currentDataset as Dataset, query as Query),
-				(error) => {
-					return error;
+				() => evaluateQuery(this.currentDataset as Dataset, query as Query),
+				(err) => {
+					return Promise.reject(err);
 				}
 			);
 		} else {
