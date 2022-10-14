@@ -4,6 +4,7 @@ import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
 import {InsightDatasetKind, InsightResult} from "../../src/controller/IInsightFacade";
 import {clearDisk, getContentFromArchives} from "../TestUtil";
+import {Section} from "../../src/controller/Dataset";
 
 chai.use(chaiAsPromised);
 
@@ -46,6 +47,7 @@ describe("PQ", function () {
 			ORDER: "sections_avg"
 		}
 	};
+
 	const andResult = [{sections_dept: "adhe", sections_avg: 90.02},
 		{sections_dept: "adhe", sections_avg: 90.82},
 		{sections_dept: "adhe", sections_avg: 92.54},
@@ -54,7 +56,6 @@ describe("PQ", function () {
 
 	it("should AND", async function () {
 		let ir: InsightResult[] = await facade.performQuery(and);
-		console.log(ir);
 		expect(ir).to.deep.equal(andResult);
 	});
 });

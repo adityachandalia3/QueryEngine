@@ -349,9 +349,9 @@ describe("InsightFacade", function () {
 			(input) => facade.performQuery(input),
 			"./test/resources/queries",
 			{
-				// added for less verbose logs
 				assertOnResult: (actual, expected) => {
-					console.log(actual === expected);
+					// does not test for order
+					expect(actual).to.have.deep.members(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
