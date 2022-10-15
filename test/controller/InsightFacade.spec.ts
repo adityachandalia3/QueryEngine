@@ -285,6 +285,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should list one dataset", function () {
+				fs.removeSync("project_team104/currentIds")
 				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
@@ -301,6 +302,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should list multiple datasets", function () {
+				fs.removeSync("project_team104/currentIds")
 				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)

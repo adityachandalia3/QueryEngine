@@ -82,7 +82,7 @@ export function loadIds(): Promise<string> {
 
 export function saveIds(id: string): Promise<string> {
 	try{
-		return fs.appendFile("project_team104/currentIds"," "+id,"utf-8").then (() => {
+		return fs.appendFile("project_team104/currentIds",","+id,"utf-8").then (() => {
 			return Promise.resolve("Id has been saved")
 		})
 	} catch {

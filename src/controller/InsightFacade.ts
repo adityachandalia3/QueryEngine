@@ -39,7 +39,6 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
 		}
 		return JSZip.loadAsync(content, {base64: true}).then( (zip) => {
-
 			if (zip.folder("courses") === null) {
 				return Promise.reject(new InsightError("No directory named courses"));
 			} else {
@@ -47,7 +46,6 @@ export default class InsightFacade implements IInsightFacade {
 			}
 			const zipContent: any[] = [];
 			const promises: any[] = [];
-
 			zip.forEach(async (relativePath, file) => {
 				const promise = file.async("string");
 				promises.push(promise);
@@ -75,7 +73,7 @@ export default class InsightFacade implements IInsightFacade {
 				this.currentIds.push(id);
 				await saveDataset(this.currentDataset);
 				console.log(this.currentIds);
-				// await saveIds(this.currentIds);
+				await saveIds(id);
 			});
 		}).then(() => {
 			return Promise.resolve(this.currentIds);
@@ -117,18 +115,27 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async listDatasets(): Promise<InsightDataset[]> {
 		let listArray: InsightDataset[] = [];
-		// let loaded = await loadIds();
-		// let loadedArray = loaded.split(" ");
-		// loadedArray.shift();
-		// let newLoadedArray = loadedArray.filter(function (item, pos){
-		// 	return loadedArray.indexOf(item) == pos;
+		let loaded = await loadIds();
+		let loadedArray = loaded.split(",");
+		console.log(loadedArray)
+		loadedArray.shift();
+		let newLoadedArray = loadedArray.filter(function (item, pos){
+			return loadedArray.indexOf(item) == pos;
+		})
+
+		console.log(newLoadedArray)
+		// let newestLoadedArray = newLoadedArray.forEach(function(elem) {
+		// 	elem.trim();
 		// })
+		//
+		// console.log(newestLoadedArray)
 
 
-		for (const id of this.currentIds) {
-				await loadDataset(id).then((current) => {
+		for (const id of newLoadedArray) {
+			// there is supposed to be an await before load dataset.
+			loadDataset(id).then((current) => {
 				listArray.push(current.getInsightDataset());
-			})
+			});
 		}
 		return Promise.resolve(listArray);
 	}
