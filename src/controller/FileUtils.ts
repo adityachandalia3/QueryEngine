@@ -19,7 +19,6 @@ const persistDir = "./data/";
 export function saveDataset(dataset: Dataset): Promise<string> {
 	try {
 		return fs.outputJson(persistDir + dataset.id + ".JSON", dataset).then(async () => {
-			// await saveIds(dataset.id)
 			return Promise.resolve(dataset.id);
 		});
 	} catch {
@@ -40,31 +39,42 @@ export function saveDataset(dataset: Dataset): Promise<string> {
  */
 export function loadDataset(id: string): Promise<Dataset> {
 	try {
-		return fs.readJson(persistDir + id + ".JSON").then((loading) => {
-			let newDataset = new Dataset(loading.id, loading.kind, loading.sections.length, loading.sections);
-			return Promise.resolve(newDataset);
-		});
+		return fs.readJson(persistDir + id + ".JSON");
 	} catch {
 		return Promise.reject(new InsightError("Could not read file with given id"));
 	}
 }
 
-export function loadIds(): Promise<string> {
-	try {
-		return fs.readFile(persistDir + "currentIds", "utf-8").then((stringArray) => {
-			return Promise.resolve(stringArray);
-		});
-	} catch {
-		return Promise.reject(new InsightError("Current Ids could not be loaded"));
-	}
+export function loadIds(): Promise<string[]> {
+	return fs.readJson(persistDir + "ids" + ".JSON").then(
+		(ids) => {
+			return Promise.resolve(ids);
+		},
+		(err) => {
+			if (err.code !== "ENOENT") {
+				throw err;
+			}
+			return Promise.resolve([]);
+		}
+	);
 }
 
-export function saveIds(id: string): Promise<string> {
-	try {
-		return fs.appendFile(persistDir + "currentIds", "," + id, "utf-8").then(() => {
-			return Promise.resolve("Id has been saved");
-		});
-	} catch {
-		return Promise.reject("Id could not be saved");
+export function saveIds(ids: string[]): Promise<string[]> {
+	return fs.outputJson(persistDir + "ids" + ".JSON", ids).then(async () => {
+		return Promise.resolve(ids);
+	});
+}
+
+/**
+ * To be run once when currentIds has not been initialized yet
+ *
+ * @param ids
+ * @returns
+ */
+export async function updateIds(ids: string[] | null): Promise<string[]> {
+	if (ids === null) {
+		return loadIds();
+	} else {
+		return Promise.resolve(ids);
 	}
 }
