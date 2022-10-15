@@ -48,18 +48,7 @@ export default class InsightFacade implements IInsightFacade {
 		}
 		return JSZip.loadAsync(content, {base64: true})
 			.then((zip) => {
-				if (zip.folder("courses") === null) {
-					return Promise.reject(new InsightError("No directory named courses"));
-				} else {
-					zip = zip.folder("courses") as JSZip;
-				}
-				const zipContent: any[] = [];
-				const promises: any[] = [];
-				zip.forEach(async (relativePath, file) => {
-					const promise = file.async("string");
-					promises.push(promise);
-					zipContent.push({file: relativePath, content: await promise});
-				});
+				let [promises, zipContent] = AD.zipToContent(zip);
 				return Promise.all(promises).then(async () => {
 					let sections: Section[] = [];
 					for (const zc of zipContent) {

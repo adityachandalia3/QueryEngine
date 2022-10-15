@@ -8,7 +8,7 @@ import {Section} from "../../src/controller/Dataset";
 
 chai.use(chaiAsPromised);
 
-describe("PQ", function () {
+describe("Integration", function () {
 	let facade: InsightFacade;
 
 	before(async function () {
@@ -21,6 +21,17 @@ describe("PQ", function () {
 		facade = new InsightFacade();
 		console.log(await facade.addDataset("sections", content, InsightDatasetKind.Sections));
 		console.log(await facade.addDataset("sections2", content, InsightDatasetKind.Sections));
+
+		let ir: InsightResult[] = await facade.performQuery(and);
+		expect(ir).to.have.deep.members(andResult);
+	});
+
+	it("should query on previously added dataset", async function () {
+		let content: string = getContentFromArchives("pair.zip");
+
+		facade = new InsightFacade();
+		await facade.addDataset("sections", content, InsightDatasetKind.Sections);
+		facade = new InsightFacade();
 
 		let ir: InsightResult[] = await facade.performQuery(and);
 		expect(ir).to.have.deep.members(andResult);

@@ -1,4 +1,6 @@
+import JSZip from "jszip";
 import {Section} from "./Dataset";
+import {InsightError} from "./IInsightFacade";
 
 export interface Content {
 	result: Result[];
@@ -18,7 +20,21 @@ export interface Result {
 	Section: string;
 }
 
-// export function
+export function zipToContent(zip: JSZip): any[] {
+	if (zip.folder("courses") === null) {
+		return [Promise.reject(new InsightError("No directory named courses"))];
+	} else {
+		zip = zip.folder("courses") as JSZip;
+	}
+	const zipContent: any[] = [];
+	const promises: any[] = [];
+	zip.forEach(async (relativePath, file) => {
+		const promise = file.async("string");
+		promises.push(promise);
+		zipContent.push({file: relativePath, content: await promise});
+	});
+	return [promises, zipContent];
+}
 
 export function resultsToSections(results: Result[]): Section[] {
 	let sections: Section[] = [];
