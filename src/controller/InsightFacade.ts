@@ -2,8 +2,9 @@ import {Dataset, Section} from "./Dataset";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult,} from "./IInsightFacade";
 import JSZip from "jszip";
 import * as PQ from "./PerformQuery";
-import {isValidId, loadDataset, saveDataset} from "./Helpers";
+import {isValidId, loadDataset, loadIds, saveDataset, saveIds} from "./Helpers";
 import * as AD from "./AddDatset";
+import * as fs from "fs-extra";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -25,7 +26,6 @@ export default class InsightFacade implements IInsightFacade {
 		console.log("InsightFacadeImpl::init()");
 		this.currentDataset = null;
 		this.currentIds = [];
-
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -35,11 +35,12 @@ export default class InsightFacade implements IInsightFacade {
 		if (this.currentIds.includes(id)) {
 			return Promise.reject(new InsightError("dataset with same id has already been added"));
 		}
-		if(kind === InsightDatasetKind.Rooms){
+		if (kind === InsightDatasetKind.Rooms) {
 			return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
 		}
-		return JSZip.loadAsync(content, {base64: true}).then((zip) => {
-			if (zip.folder("courses") === null){
+		return JSZip.loadAsync(content, {base64: true}).then( (zip) => {
+
+			if (zip.folder("courses") === null) {
 				return Promise.reject(new InsightError("No directory named courses"));
 			} else {
 				zip = zip.folder("courses") as JSZip;
@@ -57,7 +58,6 @@ export default class InsightFacade implements IInsightFacade {
 			});
 			return Promise.all(promises).then(async () => {
 				let sections: Section[] = [];
-
 				for (const zc of zipContent) {
 					if (zc.content === "") {
 						continue;
@@ -68,12 +68,14 @@ export default class InsightFacade implements IInsightFacade {
 					}
 				}
 				this.currentDataset = new Dataset(id, kind, sections.length, sections);
-				await saveDataset(this.currentDataset);
-				if(sections.length < 1){
+
+				if (sections.length < 1) {
 					return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
 				}
 				this.currentIds.push(id);
+				await saveDataset(this.currentDataset);
 				console.log(this.currentIds);
+				// await saveIds(this.currentIds);
 			});
 		}).then(() => {
 			return Promise.resolve(this.currentIds);
@@ -113,7 +115,22 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 
-	public listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+	public async listDatasets(): Promise<InsightDataset[]> {
+		let listArray: InsightDataset[] = [];
+		// let loaded = await loadIds();
+		// let loadedArray = loaded.split(" ");
+		// loadedArray.shift();
+		// let newLoadedArray = loadedArray.filter(function (item, pos){
+		// 	return loadedArray.indexOf(item) == pos;
+		// })
+
+
+		for (const id of this.currentIds) {
+				await loadDataset(id).then((current) => {
+				listArray.push(current.getInsightDataset());
+			})
+		}
+		return Promise.resolve(listArray);
 	}
 }
+

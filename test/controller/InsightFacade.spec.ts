@@ -12,7 +12,7 @@ import * as fs from "fs-extra";
 import {folderTest} from "@ubccpsc310/folder-test";
 import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
-import {getContentFromArchives} from "../TestUtil";
+import {clearDisk, getContentFromArchives} from "../TestUtil";
 
 chai.use(chaiAsPromised);
 
@@ -51,6 +51,7 @@ describe("InsightFacade", function () {
 			// This runs before each test
 			console.info(`BeforeTest: ${this.currentTest?.title}`);
 			facade = new InsightFacade();
+			clearDisk();
 		});
 
 		after(function () {
@@ -276,6 +277,7 @@ describe("InsightFacade", function () {
 
 		describe("List Dataset", function () {
 			it("should list no datasets", function () {
+				this.timeout(10000);
 				return facade.listDatasets().then((insightDatasets) => {
 					expect(insightDatasets).to.be.an.instanceOf(Array);
 					expect(insightDatasets).to.have.length(0);
@@ -283,6 +285,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should list one dataset", function () {
+				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
 					.then(() => facade.listDatasets())
@@ -298,6 +301,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should list multiple datasets", function () {
+				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
 					.then(() => {
