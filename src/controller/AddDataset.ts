@@ -18,7 +18,7 @@ export interface Result {
 	Section: string;
 }
 
-// export function 
+// export function
 
 export function resultsToSections(results: Result[]): Section[] {
 	let sections: Section[] = [];

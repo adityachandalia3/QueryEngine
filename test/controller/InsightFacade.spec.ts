@@ -51,7 +51,6 @@ describe("InsightFacade", function () {
 			// This runs before each test
 			console.info(`BeforeTest: ${this.currentTest?.title}`);
 			facade = new InsightFacade();
-			clearDisk();
 		});
 
 		after(function () {
