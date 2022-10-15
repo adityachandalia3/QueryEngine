@@ -1,5 +1,17 @@
 import {InsightDatasetKind, InsightDataset} from "./IInsightFacade";
-import Section from "./Section";
+
+export interface Section {
+	dept: string;
+	id: string;
+	instructor: string;
+	title: string;
+	uuid: number;
+	avg: number;
+	pass: number;
+	fail: number;
+	audit: number;
+	year: number;
+}
 
 interface IDataset extends InsightDataset {
 	readonly id: string;
@@ -17,7 +29,7 @@ interface IDataset extends InsightDataset {
 	getInsightDataset(): InsightDataset;
 }
 
-export default class Dataset implements IDataset {
+export class Dataset implements IDataset {
 	public readonly id: string;
 	public readonly kind: InsightDatasetKind;
 	public readonly numRows: number;

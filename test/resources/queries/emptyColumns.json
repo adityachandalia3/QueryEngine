@@ -8,8 +8,7 @@
       },
       "OPTIONS": {
         "COLUMNS": [
-        ],
-        "ORDER": "sections_avg"
+        ]
       }
     },
     "errorExpected": true,
