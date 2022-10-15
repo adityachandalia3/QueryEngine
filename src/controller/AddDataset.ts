@@ -18,6 +18,8 @@ export interface Result {
 	Section: string;
 }
 
+// export function 
+
 export function resultsToSections(results: Result[]): Section[] {
 	let sections: Section[] = [];
 	for (const result of results) {

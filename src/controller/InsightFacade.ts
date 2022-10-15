@@ -14,7 +14,6 @@ import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation
 import {containsId, isValidId, loadDataset, loadIds, saveDataset, saveIds} from "./Helpers";
 import * as AD from "./AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
-import * as fs from "fs-extra";
 
 /**
  * This is the main programmatic entry point for the project.
