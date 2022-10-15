@@ -13,7 +13,7 @@ import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation
 import {containsId, isValidId} from "./Helpers";
 import * as AD from "./AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
-import {saveDataset, saveIds, loadDataset, loadIds, updateIds} from "./FileUtils";
+import {saveDataset, saveIds, loadDataset, loadIds, updateIds, unlinkDataset} from "./FileUtils";
 import * as fs from "fs";
 
 /**
@@ -85,16 +85,13 @@ export default class InsightFacade implements IInsightFacade {
 			if (!isValidId(id)) {
 				return Promise.reject(new InsightError("id is not valid"));
 			}
-			if (!ids.includes(id)) {
-				return Promise.reject(new NotFoundError("dataset with id not found"));
-			}
 			if (this.currentIds?.includes(id)) {
 				let index = this.currentIds?.indexOf(id);
 				this.currentIds?.splice(index, 1);
+			} else {
+				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-			await fs.unlink("./data/" + id + ".JSON", err => {
-				if (err) throw err;
-			})
+			await unlinkDataset(id);
 			await saveIds(this.currentIds as string[]);
 			return Promise.resolve(id);
 		});
