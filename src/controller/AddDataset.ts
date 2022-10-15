@@ -24,34 +24,18 @@ export function resultsToSections(results: Result[]): Section[] {
 		if (result.Section === "overall") {
 			result.Year = 1900;
 		}
-		if (result.Subject === undefined) {
-			continue;
-		}
-		if (result.Course === undefined) {
-			continue;
-		}
-		if (result.Professor === undefined) {
-			continue;
-		}
-		if (result.Title === undefined) {
-			continue;
-		}
-		if (result.id === undefined) {
-			continue;
-		}
-		if (result.Avg === undefined) {
-			continue;
-		}
-		if (result.Pass === undefined) {
-			continue;
-		}
-		if (result.Fail === undefined) {
-			continue;
-		}
-		if (result.Audit === undefined) {
-			continue;
-		}
-		if (result.Year === undefined) {
+		if (
+			result.Subject === undefined ||
+			result.Course === undefined ||
+			result.Professor === undefined ||
+			result.Title === undefined ||
+			result.id === undefined ||
+			result.Avg === undefined ||
+			result.Pass === undefined ||
+			result.Fail === undefined ||
+			result.Audit === undefined ||
+			result.Year === undefined
+		) {
 			continue;
 		}
 		sections.push({
