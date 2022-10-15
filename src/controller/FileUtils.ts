@@ -1,5 +1,5 @@
-import { Dataset } from "./Dataset";
-import { InsightError } from "./IInsightFacade";
+import {Dataset} from "./Dataset";
+import {InsightError} from "./IInsightFacade";
 import * as fs from "fs-extra";
 
 const persistDir = "./data/";
@@ -16,7 +16,7 @@ const persistDir = "./data/";
  * The promise should fulfill with the id of the saved dataset.
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
- export function saveDataset(dataset: Dataset): Promise<string> {
+export function saveDataset(dataset: Dataset): Promise<string> {
 	try {
 		return fs.outputJson(persistDir + dataset.id + ".JSON", dataset).then(async () => {
 			// await saveIds(dataset.id)

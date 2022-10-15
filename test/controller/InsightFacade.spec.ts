@@ -61,7 +61,7 @@ describe("InsightFacade", function () {
 			// This section resets the data directory (removing any cached data)
 			// This runs after each test, which should make each test independent of the previous one
 			console.info(`AfterTest: ${this.currentTest?.title}`);
-			fs.removeSync(persistDirectory);
+			// fs.removeSync(persistDirectory);
 		});
 		describe("Add Dataset", function () {
 			it("should list/contain 0 datasets initially", function () {

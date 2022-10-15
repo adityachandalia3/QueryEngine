@@ -12,7 +12,7 @@ import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation
 import {isValidId} from "./Helpers";
 import * as AD from "./AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
-import { saveDataset, saveIds, loadDataset, loadIds } from "./FileUtils";
+import {saveDataset, saveIds, loadDataset, loadIds} from "./FileUtils";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -113,7 +113,10 @@ export default class InsightFacade implements IInsightFacade {
 				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
 			} else {
 				return loadDataset(id).then(
-					() => evaluateQuery(this.currentDataset as Dataset, query as Query),
+					(dataset) => {
+						this.currentDataset = dataset;
+						return evaluateQuery(this.currentDataset as Dataset, query as Query);
+					},
 					(err) => {
 						return Promise.reject(err);
 					}
