@@ -339,7 +339,7 @@ describe("InsightFacade", function () {
 			// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
-				1, // facade.addDataset("sections", datasetContents.get("sections") ?? "", InsightDatasetKind.Sections),
+				facade.addDataset("sections", datasetContents.get("sections") ?? "", InsightDatasetKind.Sections),
 			];
 
 			return Promise.all(loadDatasetPromises);
@@ -357,6 +357,10 @@ describe("InsightFacade", function () {
 			(input) => facade.performQuery(input),
 			"./test/resources/queries",
 			{
+				assertOnResult: (actual, expected) => {
+					// does not test for order
+					expect(actual).to.have.deep.members(expected);
+				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
 				assertOnError: (actual, expected) => {

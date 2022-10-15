@@ -24,6 +24,10 @@ export function isValidId(id: string): boolean {
 	return true;
 }
 
+export function containsId(id: string): boolean {
+	return true;
+}
+
 /**
  * Saves a dataset (stored in memory in the InsightDataset object) to disk as a JSON file.
  * Will update (or create if none) a metadata file mapping ids to file path
@@ -74,19 +78,19 @@ export function loadIds(): Promise<string> {
 	try {
 		 return fs.readFile("project_team104/currentIds", "utf-8").then((stringArray) => {
 			return Promise.resolve(stringArray);
-		})
+		});
 	} catch {
-		return Promise.reject(new InsightError("Current Ids could not be loaded"))
+		return Promise.reject(new InsightError("Current Ids could not be loaded"));
 	}
 }
 
 export function saveIds(id: string): Promise<string> {
 	try{
-		return fs.appendFile("project_team104/currentIds"," "+id,"utf-8").then (() => {
-			return Promise.resolve("Id has been saved")
-		})
+		return fs.appendFile("project_team104/currentIds"," " + id,"utf-8").then (() => {
+			return Promise.resolve("Id has been saved");
+		});
 	} catch {
-		return Promise.reject("Id could not be saved")
+		return Promise.reject("Id could not be saved");
 	}
 }
 

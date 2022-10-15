@@ -1,5 +1,6 @@
-import {isValidId} from "./Helpers";
-import {InsightError, InsightResult} from "./IInsightFacade";
+import {Dataset, Section} from "../Dataset";
+import {isValidId} from "../Helpers";
+import {InsightError, InsightResult} from "../IInsightFacade";
 import {Filter, Mkey, Query, Skey} from "./Query";
 
 /**
@@ -37,11 +38,11 @@ export function checkAndStripId(query: string): [string, string] {
 
 /**
  *
- * Does the following:
+ * Validates WHERE then validates OPTIONS
  *
  * @param query
  *
- * Throws many errors to be caught by caller
+ * Throws errors to be caught by caller
  *
  */
 export function validateQuery(query: Query) {
@@ -54,7 +55,6 @@ export function validateQuery(query: Query) {
 }
 
 export function validateFilter(filter: Filter) {
-	console.log(filter);
 	if (Object.values(filter).length !== 1) {
 		throw new InsightError("Should only have 1 key, has " + Object.values(filter).length);
 	}
@@ -75,7 +75,6 @@ export function validateFilter(filter: Filter) {
 		}
 	} else if (filter.LT !== undefined) {
 		if (!isMkey(filter.LT)) {
-			// TODO !!!!!!!!!!!!!!!!!
 			throw new InsightError("Invalid key in LT");
 		}
 	} else if (filter.GT !== undefined) {
@@ -87,7 +86,6 @@ export function validateFilter(filter: Filter) {
 			throw new InsightError("Invalid key in EQ");
 		}
 	} else if (filter.IS !== undefined) {
-		console.log(filter.IS);
 		if (!isSkey(filter.IS)) {
 			throw new InsightError("Invalid key in IS");
 		}
@@ -102,25 +100,21 @@ export function validateOptions(query: Query) {
 	if (!Array.isArray(query.OPTIONS.COLUMNS) || query.OPTIONS.COLUMNS.length === 0) {
 		throw new InsightError("COLUMNS must be a non-empty array");
 	}
-
 	for (const k of Object.keys(query)) {
 		if (k !== "WHERE" && k !== "OPTIONS") {
 			throw new InsightError("Invalid keys in query");
 		}
 	}
-
 	for (const k of Object.keys(query.OPTIONS)) {
 		if (k !== "COLUMNS" && k !== "ORDER") {
 			throw new InsightError("Invalid keys in OPTIONS");
 		}
 	}
-
 	for (const i in query.OPTIONS.COLUMNS) {
 		if (!isField(query.OPTIONS.COLUMNS[i])) {
 			throw new InsightError("Invalid key in COLUMNS");
 		}
 	}
-
 	if (query.OPTIONS.ORDER !== undefined) {
 		if (!isField(query.OPTIONS.ORDER)) {
 			throw new InsightError("Invalid ORDER type");
@@ -129,26 +123,6 @@ export function validateOptions(query: Query) {
 			throw new InsightError("ORDER key must be in COLUMNS");
 		}
 	}
-}
-
-/**
- * Apply query to dataset and return result
- *
- * @param filter, columns, order
- *
- *
- * @return InsightResult[]
- *
- * Will throw ResultTooLargeError if length > 5000
- */
-export function evaluateQuery(): InsightResult[] {
-	// iterate dataset
-	// if PREDICATE return mapped version (2 functions)
-	// newlist = list.filter(predicate)
-	// check length (in filter?)
-	// map(callbackFn)
-	// sort
-	return [];
 }
 
 export function isQuery(query: unknown): query is Query {

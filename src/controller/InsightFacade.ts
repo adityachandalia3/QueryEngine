@@ -1,9 +1,19 @@
 import {Dataset, Section} from "./Dataset";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult,} from "./IInsightFacade";
+import {
+	IInsightFacade,
+	InsightDataset,
+	InsightDatasetKind,
+	InsightError,
+	InsightResult,
+	NotFoundError,
+	ResultTooLargeError,
+} from "./IInsightFacade";
+import {Filter, Query, Mkey, Skey} from "./PerformQuery/Query";
 import JSZip from "jszip";
-import * as PQ from "./PerformQuery";
-import {isValidId, loadDataset, loadIds, saveDataset, saveIds} from "./Helpers";
-import * as AD from "./AddDatset";
+import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation";
+import {containsId, isValidId, loadDataset, saveDataset} from "./Helpers";
+import * as AD from "./AddDataset";
+import {evaluateQuery} from "./PerformQuery/Evaluation";
 import * as fs from "fs-extra";
 
 /**
@@ -39,7 +49,6 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
 		}
 		return JSZip.loadAsync(content, {base64: true}).then( (zip) => {
-
 			if (zip.folder("courses") === null) {
 				return Promise.reject(new InsightError("No directory named courses"));
 			} else {
@@ -68,7 +77,6 @@ export default class InsightFacade implements IInsightFacade {
 					}
 				}
 				this.currentDataset = new Dataset(id, kind, sections.length, sections);
-
 				if (sections.length < 1) {
 					return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
 				}
@@ -90,26 +98,31 @@ export default class InsightFacade implements IInsightFacade {
 		let id, queryString;
 
 		try {
-			[id, queryString] = PQ.checkAndStripId(JSON.stringify(query));
+			[id, queryString] = checkAndStripId(JSON.stringify(query));
 		} catch (err) {
 			console.log((err as Error).message);
 			return Promise.reject(err);
 		}
+
 		query = JSON.parse(queryString);
 
-		if (PQ.isQuery(query)) {
+		if (isQuery(query)) {
 			try {
-				PQ.validateQuery(query);
+				validateQuery(query);
 			} catch (err) {
 				console.log((err as Error).message);
 				return Promise.reject(err);
 			}
-			return loadDataset(id).then(
-				() => PQ.evaluateQuery(),
-				(error) => {
-					return error;
-				}
-			);
+			if (this.currentDataset !== null && this.currentDataset.id === id) {
+				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
+			} else {
+				return loadDataset(id).then(
+					() => evaluateQuery(this.currentDataset as Dataset, query as Query),
+					(err) => {
+						return Promise.reject(err);
+					}
+				);
+			}
 		} else {
 			return Promise.reject(new InsightError("Query given is not a valid query"));
 		}
@@ -126,9 +139,9 @@ export default class InsightFacade implements IInsightFacade {
 
 
 		for (const id of this.currentIds) {
-				await loadDataset(id).then((current) => {
+			loadDataset(id).then((current) => {
 				listArray.push(current.getInsightDataset());
-			})
+			});
 		}
 		return Promise.resolve(listArray);
 	}
