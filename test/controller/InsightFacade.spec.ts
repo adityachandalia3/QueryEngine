@@ -12,7 +12,7 @@ import * as fs from "fs-extra";
 import {folderTest} from "@ubccpsc310/folder-test";
 import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
-import {getContentFromArchives} from "../TestUtil";
+import {clearDisk, getContentFromArchives} from "../TestUtil";
 
 chai.use(chaiAsPromised);
 
@@ -71,6 +71,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("Should add a valid dataset", function () {
+				this.timeout(10000);
 				const id: string = "sections";
 				const expected: string[] = [id];
 				return facade
@@ -79,6 +80,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should add two datasets", function () {
+				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
 					.then((addedIds) => {
@@ -92,12 +94,14 @@ describe("InsightFacade", function () {
 			});
 
 			it("should add dataset with id with whitespace", function () {
+				this.timeout(10000);
 				return facade.addDataset("sections 1", content, InsightDatasetKind.Sections).then((addedIds) => {
 					expect(addedIds).to.deep.equal(["sections 1"]);
 				});
 			});
 
 			it("should reject two datasets of same id", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				try {
 					await facade.addDataset("sections", content, InsightDatasetKind.Sections);
@@ -145,6 +149,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should remove a dataset", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				let result = await facade.removeDataset("sections");
 
@@ -155,6 +160,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should remove first of two datasets", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				await facade.addDataset("sections-2", content, InsightDatasetKind.Sections);
 
@@ -174,6 +180,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should remove second of two datasets", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				await facade.addDataset("sections-2", content, InsightDatasetKind.Sections);
 
@@ -193,6 +200,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should remove a dataset with id that has a space", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections 1", content, InsightDatasetKind.Sections);
 
 				let result = await facade.removeDataset("sections 1");
@@ -204,6 +212,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should add a dataset that has been previously removed", function () {
+				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
 					.then((addedIds) => {
@@ -220,6 +229,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should reject dataset that has not been added yet", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				try {
 					await facade.removeDataset("rooms");
@@ -232,6 +242,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should reject id with underscore", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				try {
 					await facade.removeDataset("sections_1");
@@ -244,6 +255,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should reject id with only whitespace", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				try {
 					await facade.removeDataset("   ");
@@ -257,6 +269,7 @@ describe("InsightFacade", function () {
 			});
 
 			it("should reject blank id", async function () {
+				this.timeout(10000);
 				await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 				try {
 					await facade.removeDataset("");
@@ -271,7 +284,9 @@ describe("InsightFacade", function () {
 		});
 
 		describe("List Dataset", function () {
+			this.timeout(10000);
 			it("should list no datasets", function () {
+				this.timeout(10000);
 				return facade.listDatasets().then((insightDatasets) => {
 					expect(insightDatasets).to.be.an.instanceOf(Array);
 					expect(insightDatasets).to.have.length(0);
@@ -279,6 +294,9 @@ describe("InsightFacade", function () {
 			});
 
 			it("should list one dataset", function () {
+				this.timeout(10000);
+				fs.removeSync("project_team104/currentIds");
+				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
 					.then(() => facade.listDatasets())
@@ -294,6 +312,8 @@ describe("InsightFacade", function () {
 			});
 
 			it("should list multiple datasets", function () {
+				fs.removeSync("project_team104/currentIds");
+				this.timeout(10000);
 				return facade
 					.addDataset("sections", content, InsightDatasetKind.Sections)
 					.then(() => {
@@ -324,6 +344,7 @@ describe("InsightFacade", function () {
 	 */
 	describe("PerformQuery", () => {
 		before(function () {
+			this.timeout(10000);
 			console.info(`Before: ${this.test?.parent?.title}`);
 
 			facade = new InsightFacade();
