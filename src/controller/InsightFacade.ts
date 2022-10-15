@@ -14,6 +14,7 @@ import {containsId, isValidId} from "./Helpers";
 import * as AD from "./AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
 import {saveDataset, saveIds, loadDataset, loadIds, updateIds} from "./FileUtils";
+import * as fs from "fs";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -80,21 +81,21 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public removeDataset(id: string): Promise<string> {
-		return updateIds(this.currentIds).then((ids) => {
+		return updateIds(this.currentIds).then(async (ids) => {
 			if (!isValidId(id)) {
 				return Promise.reject(new InsightError("id is not valid"));
 			}
 			if (!ids.includes(id)) {
 				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-
-			/**
-			 * TODO
-			 * - remove from this.currentIds
-			 * - saveIds(this.currentIds);
-			 * - remove file
-			 */
-
+			if (this.currentIds?.includes(id)) {
+				let index = this.currentIds?.indexOf(id);
+				this.currentIds?.splice(index, 1);
+			}
+			await fs.unlink("./data/" + id + ".JSON", err => {
+				if (err) throw err;
+			})
+			await saveIds(this.currentIds as string[]);
 			return Promise.resolve(id);
 		});
 	}
