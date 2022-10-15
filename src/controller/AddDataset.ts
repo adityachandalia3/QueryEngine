@@ -1,21 +1,21 @@
 import {Section} from "./Dataset";
 
 export interface Content {
-	result: Result[]
+	result: Result[];
 }
 
 export interface Result {
-	Subject: string,
-	Course: string,
-	Professor: string,
-	Title: string,
-	id: number,
-	Avg: number,
-	Pass: number,
-	Fail: number,
-	Audit: number,
-	Year: number,
-	Section: string
+	Subject: string;
+	Course: string;
+	Professor: string;
+	Title: string;
+	id: number;
+	Avg: number;
+	Pass: number;
+	Fail: number;
+	Audit: number;
+	Year: number;
+	Section: string;
 }
 
 export function resultsToSections(results: Result[]): Section[] {
@@ -27,34 +27,35 @@ export function resultsToSections(results: Result[]): Section[] {
 		if (result.Subject === undefined) {
 			continue;
 		}
-		if (result.Course === undefined){
+		if (result.Course === undefined) {
 			continue;
 		}
-		if (result.Professor === undefined){
+		if (result.Professor === undefined) {
 			continue;
 		}
-		if (result.Title === undefined){
+		if (result.Title === undefined) {
 			continue;
 		}
-		if (result.id === undefined){
+		if (result.id === undefined) {
 			continue;
 		}
-		if (result.Avg === undefined){
+		if (result.Avg === undefined) {
 			continue;
 		}
-		if (result.Pass === undefined){
+		if (result.Pass === undefined) {
 			continue;
 		}
-		if (result.Fail === undefined){
+		if (result.Fail === undefined) {
 			continue;
 		}
-		if (result.Audit === undefined){
+		if (result.Audit === undefined) {
 			continue;
 		}
-		if (result.Year === undefined){
+		if (result.Year === undefined) {
 			continue;
 		}
-		sections.push({dept: result.Subject,
+		sections.push({
+			dept: result.Subject,
 			id: result.Course,
 			instructor: result.Professor,
 			title: result.Title,
@@ -63,7 +64,7 @@ export function resultsToSections(results: Result[]): Section[] {
 			pass: result.Pass,
 			fail: result.Fail,
 			audit: result.Audit,
-			year: result.Year
+			year: result.Year,
 		});
 	}
 	return sections;

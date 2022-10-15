@@ -8,7 +8,6 @@ import {Section} from "../../src/controller/Dataset";
 
 chai.use(chaiAsPromised);
 
-
 describe("PQ", function () {
 	let facade: InsightFacade;
 
@@ -24,35 +23,34 @@ describe("PQ", function () {
 			AND: [
 				{
 					GT: {
-						sections_avg: 90
-					}
+						sections_avg: 90,
+					},
 				},
 				{
 					IS: {
-						sections_dept: "adhe"
-					}
+						sections_dept: "adhe",
+					},
 				},
 				{
 					IS: {
-						sections_id: "329"
-					}
-				}
-			]
+						sections_id: "329",
+					},
+				},
+			],
 		},
 		OPTIONS: {
-			COLUMNS: [
-				"sections_dept",
-				"sections_avg"
-			],
-			ORDER: "sections_avg"
-		}
+			COLUMNS: ["sections_dept", "sections_avg"],
+			ORDER: "sections_avg",
+		},
 	};
 
-	const andResult = [{sections_dept: "adhe", sections_avg: 90.02},
+	const andResult = [
+		{sections_dept: "adhe", sections_avg: 90.02},
 		{sections_dept: "adhe", sections_avg: 90.82},
 		{sections_dept: "adhe", sections_avg: 92.54},
 		{sections_dept: "adhe", sections_avg: 93.33},
-		{sections_dept: "adhe", sections_avg: 96.11}];
+		{sections_dept: "adhe", sections_avg: 96.11},
+	];
 
 	it("should AND", async function () {
 		let ir: InsightResult[] = await facade.performQuery(and);

@@ -48,7 +48,6 @@ function evaluateFilter(sections: Section[], filter: Filter): Section[] {
 			let temp: Section[] = evaluateFilter(result, f as Filter);
 			// referenced https://stackoverflow.com/a/43820518 to reduce time complexity
 			result = result.filter(Set.prototype.has, new Set(temp));
-
 		}
 	} else if (filter.OR) {
 		result = [];
@@ -109,7 +108,6 @@ function isMatch(field: string, comparator: string): boolean {
 		} else {
 			return field.startsWith(comparator.slice(0, -1));
 		}
-
 	} else {
 		return field.includes(comparator.slice(1, -1));
 	}

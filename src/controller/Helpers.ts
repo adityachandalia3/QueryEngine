@@ -63,20 +63,19 @@ export function saveDataset(dataset: Dataset): Promise<string> {
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
 export function loadDataset(id: string): Promise<Dataset> {
-	try{
-		 return fs.readJson("project_team104/data/" + id + ".JSON").then( (loading) =>{
-			 let newDataset = new Dataset(loading.id,loading.kind,loading.sections.length, loading.sections);
-			 return Promise.resolve(newDataset);
+	try {
+		return fs.readJson("project_team104/data/" + id + ".JSON").then((loading) => {
+			let newDataset = new Dataset(loading.id, loading.kind, loading.sections.length, loading.sections);
+			return Promise.resolve(newDataset);
 		});
 	} catch {
 		return Promise.reject(new InsightError("Could not read file with given id"));
 	}
 }
 
-
 export function loadIds(): Promise<string> {
 	try {
-		 return fs.readFile("project_team104/currentIds", "utf-8").then((stringArray) => {
+		return fs.readFile("project_team104/currentIds", "utf-8").then((stringArray) => {
 			return Promise.resolve(stringArray);
 		});
 	} catch {
@@ -85,13 +84,11 @@ export function loadIds(): Promise<string> {
 }
 
 export function saveIds(id: string): Promise<string> {
-	try{
-		return fs.appendFile("project_team104/currentIds"," " + id,"utf-8").then (() => {
+	try {
+		return fs.appendFile("project_team104/currentIds", "," + id, "utf-8").then(() => {
 			return Promise.resolve("Id has been saved");
 		});
 	} catch {
 		return Promise.reject("Id could not be saved");
 	}
 }
-
-

@@ -11,7 +11,7 @@ import {
 import {Filter, Query, Mkey, Skey} from "./PerformQuery/Query";
 import JSZip from "jszip";
 import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation";
-import {containsId, isValidId, loadDataset, saveDataset} from "./Helpers";
+import {containsId, isValidId, loadDataset, loadIds, saveDataset, saveIds} from "./Helpers";
 import * as AD from "./AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
 import * as fs from "fs-extra";
@@ -48,46 +48,44 @@ export default class InsightFacade implements IInsightFacade {
 		if (kind === InsightDatasetKind.Rooms) {
 			return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
 		}
-		return JSZip.loadAsync(content, {base64: true}).then( (zip) => {
-			if (zip.folder("courses") === null) {
-				return Promise.reject(new InsightError("No directory named courses"));
-			} else {
-				zip = zip.folder("courses") as JSZip;
-			}
-			const zipContent: any[] = [];
-			const promises: any[] = [];
-
-			zip.forEach(async (relativePath, file) => {
-				const promise = file.async("string");
-				promises.push(promise);
-				zipContent.push({
-					file: relativePath,
-					content: await promise
+		return JSZip.loadAsync(content, {base64: true})
+			.then((zip) => {
+				if (zip.folder("courses") === null) {
+					return Promise.reject(new InsightError("No directory named courses"));
+				} else {
+					zip = zip.folder("courses") as JSZip;
+				}
+				const zipContent: any[] = [];
+				const promises: any[] = [];
+				zip.forEach(async (relativePath, file) => {
+					const promise = file.async("string");
+					promises.push(promise);
+					zipContent.push({file: relativePath, content: await promise});
 				});
-			});
-			return Promise.all(promises).then(async () => {
-				let sections: Section[] = [];
-				for (const zc of zipContent) {
-					if (zc.content === "") {
-						continue;
+				return Promise.all(promises).then(async () => {
+					let sections: Section[] = [];
+					for (const zc of zipContent) {
+						if (zc.content === "") {
+							continue;
+						}
+						let results: AD.Result[] = (JSON.parse(zc.content) as AD.Content).result;
+						if (results.length > 0) {
+							sections = sections.concat(AD.resultsToSections(results));
+						}
 					}
-					let results: AD.Result[] = (JSON.parse(zc.content) as AD.Content).result;
-					if (results.length > 0) {
-						sections = sections.concat(AD.resultsToSections(results));
+					this.currentDataset = new Dataset(id, kind, sections.length, sections);
+					if (sections.length < 1) {
+						return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
 					}
-				}
-				this.currentDataset = new Dataset(id, kind, sections.length, sections);
-				if (sections.length < 1) {
-					return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
-				}
-				this.currentIds.push(id);
-				await saveDataset(this.currentDataset);
-				console.log(this.currentIds);
-				// await saveIds(this.currentIds);
+					this.currentIds.push(id);
+					await saveDataset(this.currentDataset);
+					console.log(this.currentIds);
+					await saveIds(id);
+				});
+			})
+			.then(() => {
+				return Promise.resolve(this.currentIds);
 			});
-		}).then(() => {
-			return Promise.resolve(this.currentIds);
-		});
 	}
 
 	public removeDataset(id: string): Promise<string> {
@@ -130,15 +128,23 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async listDatasets(): Promise<InsightDataset[]> {
 		let listArray: InsightDataset[] = [];
-		// let loaded = await loadIds();
-		// let loadedArray = loaded.split(" ");
-		// loadedArray.shift();
-		// let newLoadedArray = loadedArray.filter(function (item, pos){
-		// 	return loadedArray.indexOf(item) == pos;
+		let loaded = await loadIds();
+		let loadedArray = loaded.split(",");
+		console.log(loadedArray);
+		loadedArray.shift();
+		let newLoadedArray = loadedArray.filter(function (item, pos) {
+			return loadedArray.indexOf(item) === pos;
+		});
+
+		console.log(newLoadedArray);
+		// let newestLoadedArray = newLoadedArray.forEach(function(elem) {
+		// 	elem.trim();
 		// })
+		//
+		// console.log(newestLoadedArray)
 
-
-		for (const id of this.currentIds) {
+		for (const id of newLoadedArray) {
+			// there is supposed to be an await before load dataset.
 			loadDataset(id).then((current) => {
 				listArray.push(current.getInsightDataset());
 			});
@@ -146,4 +152,3 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.resolve(listArray);
 	}
 }
-
