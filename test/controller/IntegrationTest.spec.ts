@@ -14,7 +14,7 @@ describe("Integration", function () {
 	before(function () {
 		clearDisk();
 	});
-	
+
 	afterEach(function () {
 		clearDisk();
 	});

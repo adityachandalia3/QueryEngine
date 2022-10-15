@@ -344,7 +344,7 @@ describe("InsightFacade", function () {
 	 */
 	describe("PerformQuery", () => {
 		before(function () {
-			this.timeout(10000)
+			this.timeout(10000);
 			console.info(`Before: ${this.test?.parent?.title}`);
 
 			facade = new InsightFacade();

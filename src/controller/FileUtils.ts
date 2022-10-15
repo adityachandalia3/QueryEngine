@@ -46,11 +46,11 @@ export function loadDataset(id: string): Promise<Dataset> {
 }
 
 export async function unlinkDataset(id: string) {
-	await fs.unlink("./data/" + id + ".JSON", err => {
+	await fs.unlink("./data/" + id + ".JSON", (err) => {
 		if (err) {
 			throw err;
 		}
-	})
+	});
 }
 
 export function loadIds(): Promise<string[]> {
