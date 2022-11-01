@@ -14,30 +14,34 @@ import {Query, Filter, Mkey, Skey} from "./Query";
  * Will throw ResultTooLargeError if length > 5000
  */
 export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
+	const maxResultLength: number = 5000;
 	let filteredSections: Section[];
 	if (Object.values(query.WHERE).length === 0) {
 		filteredSections = dataset.sections;
 	} else {
 		filteredSections = evaluateFilter(dataset.sections, query.WHERE);
 	}
-	if (filteredSections.length > 5000) {
+	if (filteredSections.length > maxResultLength) {
 		throw new ResultTooLargeError(filteredSections.length + " found sections");
 	}
 	let results: InsightResult[] = sectionsToInsightResults(filteredSections, dataset.id, query.OPTIONS.COLUMNS);
-	if (query.OPTIONS.ORDER) {
-		let fieldToOrder: string = dataset.id + "_" + query.OPTIONS.ORDER;
+	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
+	return results;
+}
+
+function sortResultsBy(order: string | undefined, results: InsightResult[], id: string) {
+	if (order) {
+		let field: string = id + "_" + order;
 		results.sort((a, b) => {
-			if (a[fieldToOrder] < b[fieldToOrder]) {
+			if (a[field] < b[field]) {
 				return -1;
 			}
-			if (a[fieldToOrder] > b[fieldToOrder]) {
+			if (a[field] > b[field]) {
 				return 1;
 			}
-
 			return 0;
 		});
 	}
-	return results;
 }
 
 function evaluateFilter(sections: Section[], filter: Filter): Section[] {

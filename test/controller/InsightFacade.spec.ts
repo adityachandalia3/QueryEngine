@@ -371,7 +371,7 @@ describe("InsightFacade", function () {
 			"./test/resources/queries",
 			{
 				assertOnResult: (actual, expected) => {
-					// does not test for order
+					// does not test for order as ties may be broken differently
 					expect(actual).to.have.deep.members(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>

@@ -121,7 +121,6 @@ export default class InsightFacade implements IInsightFacade {
 				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
 			} else {
 				return updateIds(this.currentIds).then(() => {
-					// containsId();
 					return loadDataset(id).then(
 						(dataset) => {
 							this.currentDataset = dataset;
