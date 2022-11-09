@@ -113,7 +113,7 @@ export default class InsightFacade implements IInsightFacade {
 		if (isQuery(query)) {
 			if (this.currentDataset !== null && this.currentDataset.id === id) {
 				try {
-					validateQuery(query);
+					validateQuery(query, this.currentDataset.kind);
 				} catch (err) {
 					console.log((err as Error).message);
 					return Promise.reject(err);
@@ -126,7 +126,7 @@ export default class InsightFacade implements IInsightFacade {
 					(dataset) => {
 						this.currentDataset = dataset;
 						try {
-							validateQuery(query as Query);
+							validateQuery(query as Query, this.currentDataset.kind);
 						} catch (err) {
 							console.log((err as Error).message);
 							return Promise.reject(err);

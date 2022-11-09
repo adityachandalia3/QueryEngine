@@ -17,17 +17,32 @@ export interface Filter {
 }
 
 export interface Mkey {
+	// Sections
 	avg: number;
 	pass: number;
 	fail: number;
 	audit: number;
 	year: number;
+	// Rooms
+	lat: number;
+	lon: number;
+	seats: number;
 }
 
 export interface Skey {
+	// Sections
 	dept: string;
 	id: string;
 	instructor: string;
 	title: string;
 	uuid: string;
+	// Rooms
+	fullname: string;
+	shortname: string;
+	number: string;
+	name: string;
+	address: string;
+	type: string;
+	furniture: string;
+	href: string;
 }
