@@ -16,5 +16,6 @@
             ]
         }
     ],
-    "editor.insertSpaces": false
+    "editor.insertSpaces": false,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false
 }
