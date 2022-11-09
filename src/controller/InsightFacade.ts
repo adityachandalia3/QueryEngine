@@ -111,26 +111,32 @@ export default class InsightFacade implements IInsightFacade {
 		query = JSON.parse(queryString);
 
 		if (isQuery(query)) {
-			try {
-				validateQuery(query);
-			} catch (err) {
-				console.log((err as Error).message);
-				return Promise.reject(err);
-			}
 			if (this.currentDataset !== null && this.currentDataset.id === id) {
+				try {
+					validateQuery(query);
+				} catch (err) {
+					console.log((err as Error).message);
+					return Promise.reject(err);
+				}
 				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
 			} else {
 				return updateIds(this.currentIds).then(() => {
-					return loadDataset(id).then(
-						(dataset) => {
-							this.currentDataset = dataset;
-							return evaluateQuery(this.currentDataset as Dataset, query as Query);
-						},
-						(err) => {
+					return loadDataset(id);
+				}).then(
+					(dataset) => {
+						this.currentDataset = dataset;
+						try {
+							validateQuery(query as Query);
+						} catch (err) {
+							console.log((err as Error).message);
 							return Promise.reject(err);
 						}
-					);
-				});
+						return evaluateQuery(this.currentDataset as Dataset, query as Query);
+					},
+					(err) => {
+						return Promise.reject(err);
+					}
+				);
 			}
 		} else {
 			return Promise.reject(new InsightError("Query given is not a valid query"));
