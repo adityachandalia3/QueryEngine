@@ -177,7 +177,7 @@ describe("InsightFacade", function () {
 					return facade.addDataset("rooms 1", roomsContent, InsightDatasetKind.Rooms)
 						.then((addedIds) => {
 							expect(addedIds).to.deep.equal(["rooms 1"]);
-					});
+						});
 				});
 
 				it("should reject two room datasets of same id", async function () {
@@ -228,7 +228,7 @@ describe("InsightFacade", function () {
 							expect(addedIds).to.be.an.instanceOf(Array);
 							expect(addedIds).to.have.length(2);
 						});
-				})
+				});
 
 				it("Should add sections dataset first and then rooms dataset", async function(){
 					this.timeout(10000);
@@ -242,12 +242,8 @@ describe("InsightFacade", function () {
 							expect(addedIds).to.be.an.instanceOf(Array);
 							expect(addedIds).to.have.length(2);
 						});
-				})
-
-
-
-			})
-
+				});
+			});
 		});
 
 		describe("Remove Dataset", function () {
@@ -512,7 +508,7 @@ describe("InsightFacade", function () {
 					expect(insightDatasets).to.have.length(1);
 				});
 
-			})
+			});2
 
 			describe("Remove for rooms and sections together", function () {
 
@@ -533,7 +529,7 @@ describe("InsightFacade", function () {
 							numRows: 364,
 						},
 					]);
-				})
+				});
 
 				it("Remove rooms from a list of rooms and sections", async function(){
 					this.timeout(10000);
@@ -552,7 +548,7 @@ describe("InsightFacade", function () {
 							numRows: 64612,
 						},
 					]);
-				})
+				});
 
 				it("Remove sections from a list of multiple rooms and sections datasets", async  function(){
 					this.timeout(10000);
@@ -583,7 +579,7 @@ describe("InsightFacade", function () {
 							numRows: 64612,
 						},
 					]);
-				})
+				});
 
 				it("should remove rooms from a list of multiple rooms and sections datasets", async function(){
 					this.timeout(10000);
@@ -616,9 +612,9 @@ describe("InsightFacade", function () {
 						},
 					]);
 
-				})
-			})
-		})
+				});
+			});
+		});
 
 
 		describe("List Dataset", function () {
@@ -631,7 +627,7 @@ describe("InsightFacade", function () {
 				});
 			});
 
-			it("should list one dataset", function () {
+			it("should list one dataset of type sections only", function () {
 				this.timeout(10000);
 				fs.removeSync("project_team104/currentIds");
 				this.timeout(10000);
@@ -649,7 +645,7 @@ describe("InsightFacade", function () {
 					});
 			});
 
-			it("should list multiple datasets", function () {
+			it("should list multiple datasets of type sections only", function () {
 				fs.removeSync("project_team104/currentIds");
 				this.timeout(10000);
 				return facade
@@ -663,12 +659,89 @@ describe("InsightFacade", function () {
 					.then((insightDatasets) => {
 						expect(insightDatasets).to.be.an.instanceOf(Array);
 						expect(insightDatasets).to.have.length(2);
-						const insightDatasetsSections = insightDatasets.find((dataset) => dataset.id === "sections");
+						const insightDatasetsSections = insightDatasets
+							.find((dataset) => dataset.id === "sections");
 						expect(insightDatasetsSections).to.exist;
 						expect(insightDatasetsSections).to.deep.equal({
 							id: "sections",
 							kind: InsightDatasetKind.Sections,
 							numRows: 64612,
+						});
+					});
+			});
+
+			it("should list one dataset of type rooms only", function() {
+				this.timeout(10000);
+				fs.removeSync("project_team104/currentIds");
+				this.timeout(10000);
+				return facade
+					.addDataset("rooms", roomsContent, InsightDatasetKind.Rooms)
+					.then(() => facade.listDatasets())
+					.then((insightDatasets) => {
+						expect(insightDatasets).to.deep.equal([
+							{
+								id: "rooms",
+								kind: InsightDatasetKind.Sections,
+								numRows: 364,
+							},
+						]);
+					});
+			})
+
+			it("should list multiple datasets of type rooms only ", function (){
+				fs.removeSync("project_team104/currentIds");
+				this.timeout(10000);
+				return facade
+					.addDataset("rooms", roomsContent, InsightDatasetKind.Rooms)
+					.then(() => {
+						return facade.addDataset("rooms-2", roomsContent, InsightDatasetKind.Rooms);
+					})
+					.then(() => {
+						return facade.listDatasets();
+					})
+					.then((insightDatasets) => {
+						expect(insightDatasets).to.be.an.instanceOf(Array);
+						expect(insightDatasets).to.have.length(2);
+						const insightDatasetsSections = insightDatasets
+							.find((dataset) => dataset.id === "rooms");
+						expect(insightDatasetsSections).to.exist;
+						expect(insightDatasetsSections).to.deep.equal({
+							id: "rooms",
+							kind: InsightDatasetKind.Rooms,
+							numRows: 364,
+						});
+					});
+			})
+
+			it("should list multiple datasets of type rooms and sections", function () {
+				fs.removeSync("project_team104/currentIds");
+				this.timeout(10000);
+				return facade
+					.addDataset("rooms", roomsContent, InsightDatasetKind.Rooms)
+					.then(() => {
+						return facade.addDataset("sections", content, InsightDatasetKind.Sections);
+					})
+					.then(() => {
+						return facade.listDatasets();
+					})
+					.then((insightDatasets) => {
+						expect(insightDatasets).to.be.an.instanceOf(Array);
+						expect(insightDatasets).to.have.length(2);
+						const insightDatasetsSections = insightDatasets
+							.find((dataset) => dataset.id === "sections");
+						expect(insightDatasetsSections).to.exist;
+						expect(insightDatasetsSections).to.deep.equal({
+							id: "sections",
+							kind: InsightDatasetKind.Sections,
+							numRows: 64612,
+						});
+						const insightDatasetsRooms = insightDatasets
+							.find((dataset) => dataset.id === "rooms");
+						expect(insightDatasetsRooms).to.exist;
+						expect(insightDatasetsRooms).to.deep.equal({
+							id: "rooms",
+							kind: InsightDatasetKind.Rooms,
+							numRows: 364,
 						});
 					});
 			});
