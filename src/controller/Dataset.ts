@@ -13,11 +13,24 @@ export interface Section {
 	year: number;
 }
 
-interface IDataset extends InsightDataset {
+export interface Room {
+	fullname: string;
+	shortname: string;
+	number: string;
+	name: string;
+	address: string;
+	type: string;
+	furniture: string;
+	href: string;
+	lat: number;
+	lon: number;
+	seats: number;
+}
+
+export interface IDataset extends InsightDataset {
 	readonly id: string;
 	readonly kind: InsightDatasetKind;
 	readonly numRows: number;
-	readonly sections: Section[];
 
 	/**
 	 * Returns an InsightDataset.
@@ -29,7 +42,7 @@ interface IDataset extends InsightDataset {
 	getInsightDataset(): InsightDataset;
 }
 
-export class Dataset implements IDataset {
+export class SectionsDataset implements IDataset {
 	public readonly id: string;
 	public readonly kind: InsightDatasetKind;
 	public readonly numRows: number;
@@ -40,6 +53,24 @@ export class Dataset implements IDataset {
 		this.kind = kind;
 		this.numRows = numRows;
 		this.sections = sections;
+	}
+
+	public getInsightDataset(): InsightDataset {
+		return {id: this.id, kind: this.kind, numRows: this.numRows};
+	}
+}
+
+export class RoomsDataset implements IDataset {
+	public readonly id: string;
+	public readonly kind: InsightDatasetKind;
+	public readonly numRows: number;
+	public readonly rooms: Room[];
+
+	constructor(id: string, kind: InsightDatasetKind, numRows: number, rooms: Room[]) {
+		this.id = id;
+		this.kind = kind;
+		this.numRows = numRows;
+		this.rooms = rooms;
 	}
 
 	public getInsightDataset(): InsightDataset {

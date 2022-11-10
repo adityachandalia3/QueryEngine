@@ -1,4 +1,4 @@
-import {Dataset, Section} from "./Dataset";
+import {SectionsDataset, Section, IDataset} from "./Dataset";
 import {
 	IInsightFacade,
 	InsightDataset,
@@ -29,7 +29,7 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 * performQuery must check if currentDataset === undefined
 	 */
-	private currentDataset: Dataset | null;
+	private currentDataset: IDataset | null;
 	private currentIds: string[] | null;
 
 	constructor() {
@@ -66,7 +66,7 @@ export default class InsightFacade implements IInsightFacade {
 							sections = sections.concat(AD.resultsToSections(results));
 						}
 					}
-					this.currentDataset = new Dataset(id, kind, sections.length, sections);
+					this.currentDataset = new SectionsDataset(id, kind, sections.length, sections);
 					if (sections.length < 1) {
 						return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
 					}
@@ -118,7 +118,7 @@ export default class InsightFacade implements IInsightFacade {
 					console.log((err as Error).message);
 					return Promise.reject(err);
 				}
-				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
+				return Promise.resolve(evaluateQuery(this.currentDataset as SectionsDataset, query as Query)); 
 			} else {
 				return updateIds(this.currentIds).then(() => {
 					return loadDataset(id);
@@ -131,7 +131,7 @@ export default class InsightFacade implements IInsightFacade {
 							console.log((err as Error).message);
 							return Promise.reject(err);
 						}
-						return evaluateQuery(this.currentDataset as Dataset, query as Query);
+						return evaluateQuery(this.currentDataset as SectionsDataset, query as Query);
 					},
 					(err) => {
 						return Promise.reject(err);
@@ -155,7 +155,7 @@ export default class InsightFacade implements IInsightFacade {
 			})
 			.then((datasets) => {
 				datasets.forEach((ds) => {
-					let dataset: Dataset = ds;
+					let dataset: IDataset = ds;
 					let res: InsightDataset = {id: dataset.id, kind: dataset.kind, numRows: dataset.numRows};
 					insightDatasets.push(res);
 				});

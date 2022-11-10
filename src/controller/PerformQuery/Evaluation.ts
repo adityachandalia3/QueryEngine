@@ -1,4 +1,4 @@
-import {Dataset, Section} from "../Dataset";
+import {SectionsDataset, Section} from "../Dataset";
 import {InsightError, InsightResult, ResultTooLargeError} from "../IInsightFacade";
 import {Query, Filter, Mkey, Skey} from "./Query";
 
@@ -13,7 +13,7 @@ import {Query, Filter, Mkey, Skey} from "./Query";
  *
  * Will throw ResultTooLargeError if length > 5000
  */
-export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
+export function evaluateQuery(dataset: SectionsDataset, query: Query): InsightResult[] {
 	const maxResultLength: number = 5000;
 	let filteredSections: Section[];
 	if (Object.values(query.WHERE).length === 0) {
