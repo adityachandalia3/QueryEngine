@@ -508,7 +508,7 @@ describe("InsightFacade", function () {
 					expect(insightDatasets).to.have.length(1);
 				});
 
-			});2
+			});
 
 			describe("Remove for rooms and sections together", function () {
 
@@ -686,7 +686,7 @@ describe("InsightFacade", function () {
 							},
 						]);
 					});
-			})
+			});
 
 			it("should list multiple datasets of type rooms only ", function (){
 				fs.removeSync("project_team104/currentIds");
@@ -711,7 +711,7 @@ describe("InsightFacade", function () {
 							numRows: 364,
 						});
 					});
-			})
+			});
 
 			it("should list multiple datasets of type rooms and sections", function () {
 				fs.removeSync("project_team104/currentIds");

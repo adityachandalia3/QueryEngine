@@ -1,4 +1,4 @@
-import {Dataset, Section} from "./Dataset";
+import {SectionsDataset, Section, IDataset} from "./Dataset";
 import {
 	IInsightFacade,
 	InsightDataset,
@@ -29,7 +29,7 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 * performQuery must check if currentDataset === undefined
 	 */
-	private currentDataset: Dataset | null;
+	private currentDataset: IDataset | null;
 	private currentIds: string[] | null;
 
 	constructor() {
@@ -39,22 +39,21 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		if (kind === InsightDatasetKind.Sections) {
-			return updateIds(this.currentIds)
-				.then((ids) => {
-					this.currentIds = ids;
-					if (!isValidId(id)) {
-						return Promise.reject(new InsightError("id is not valid"));
-					}
-					if (this.currentIds.includes(id)) {
-						return Promise.reject(new InsightError("dataset with same id has already been added"));
-					}
-					// if (kind === InsightDatasetKind.Rooms) {
-					// 	return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
-					// }
-					return JSZip.loadAsync(content, {base64: true});
-				})
-				.then((zip) => {
+
+		return updateIds(this.currentIds)
+			.then((ids) => {
+				this.currentIds = ids;
+				if (!isValidId(id)) {
+					return Promise.reject(new InsightError("id is not valid"));
+				}
+				if (this.currentIds.includes(id)) {
+					return Promise.reject(new InsightError("dataset with same id has already been added"));
+				}
+
+				return JSZip.loadAsync(content, {base64: true});
+			})
+			.then((zip) => {
+				if (kind === InsightDatasetKind.Sections) {
 					let [promises, zipContent] = AD.zipToContent(zip);
 					return Promise.all(promises).then(async () => {
 						let sections: Section[] = [];
@@ -67,7 +66,7 @@ export default class InsightFacade implements IInsightFacade {
 								sections = sections.concat(AD.resultsToSections(results));
 							}
 						}
-						this.currentDataset = new Dataset(id, kind, sections.length, sections);
+						this.currentDataset = new SectionsDataset(id, kind, sections.length, sections);
 						if (sections.length < 1) {
 							return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
 						}
@@ -75,15 +74,15 @@ export default class InsightFacade implements IInsightFacade {
 						await saveDataset(this.currentDataset);
 						await saveIds(this.currentIds as string[]);
 					});
-				})
-				.then(() => {
-					return Promise.resolve(this.currentIds || []);
-				});
-		} else {
-
-			return Promise.reject();
-		}
+				} else if (kind === InsightDatasetKind.Rooms){
+					console.log(zip);
+				}
+			})
+			.then(() => {
+				return Promise.resolve(this.currentIds || []);
+			});
 	}
+
 
 	public removeDataset(id: string): Promise<string> {
 		return updateIds(this.currentIds).then(async (ids) => {
@@ -128,14 +127,14 @@ export default class InsightFacade implements IInsightFacade {
 				return Promise.reject(err);
 			}
 			if (this.currentDataset !== null && this.currentDataset.id === id) {
-				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
+				return Promise.resolve(evaluateQuery(this.currentDataset as SectionsDataset, query as Query));
 			} else {
 				return updateIds(this.currentIds).then(() => {
 					// containsId();
 					return loadDataset(id).then(
 						(dataset) => {
 							this.currentDataset = dataset;
-							return evaluateQuery(this.currentDataset as Dataset, query as Query);
+							return evaluateQuery(this.currentDataset as SectionsDataset, query as Query);
 						},
 						(err) => {
 							return Promise.reject(err);
@@ -160,7 +159,7 @@ export default class InsightFacade implements IInsightFacade {
 			})
 			.then((datasets) => {
 				datasets.forEach((ds) => {
-					let dataset: Dataset = ds;
+					let dataset: IDataset = ds;
 					let res: InsightDataset = {id: dataset.id, kind: dataset.kind, numRows: dataset.numRows};
 					insightDatasets.push(res);
 				});

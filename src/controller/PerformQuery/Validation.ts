@@ -1,7 +1,8 @@
-import {Dataset, Section} from "../Dataset";
+
 import {isValidId} from "../Helpers";
 import {InsightError, InsightResult} from "../IInsightFacade";
 import {Filter, Mkey, Query, Skey} from "./Query";
+import {SectionsDataset, Section} from "../Dataset";
 
 /**
  * Returns id and query with id stripped.
