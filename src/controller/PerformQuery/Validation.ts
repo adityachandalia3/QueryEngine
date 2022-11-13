@@ -1,8 +1,9 @@
-
 import {isValidId} from "../Helpers";
-import {InsightError, InsightResult} from "../IInsightFacade";
+import {InsightDatasetKind, InsightError, InsightResult} from "../IInsightFacade";
 import {Filter, Mkey, Query, Skey} from "./Query";
 import {SectionsDataset, Section} from "../Dataset";
+
+let isSections: boolean;
 
 /**
  * Returns id and query with id stripped.
@@ -46,7 +47,8 @@ export function checkAndStripId(query: string): [string, string] {
  * Throws errors to be caught by caller
  *
  */
-export function validateQuery(query: Query) {
+export function validateQuery(query: Query, kind: InsightDatasetKind) {
+	isSections = kind === InsightDatasetKind.Sections;
 	if (Object.values(query.WHERE).length === 1) {
 		validateFilter(query.WHERE);
 	} else if (Object.values(query.WHERE).length > 1) {
@@ -139,18 +141,34 @@ export function isQuery(query: unknown): query is Query {
 }
 
 export function isField(field: string): boolean {
-	return (
-		field === "avg" ||
-		field === "pass" ||
-		field === "fail" ||
-		field === "audit" ||
-		field === "year" ||
-		field === "dept" ||
-		field === "id" ||
-		field === "instructor" ||
-		field === "title" ||
-		field === "uuid"
-	);
+	if (isSections) {
+		return (
+			field === "avg" ||
+			field === "pass" ||
+			field === "fail" ||
+			field === "audit" ||
+			field === "year" ||
+			field === "dept" ||
+			field === "id" ||
+			field === "instructor" ||
+			field === "title" ||
+			field === "uuid"
+		);
+	} else {
+		return (
+			field === "fullname" ||
+			field === "shortname" ||
+			field === "number" ||
+			field === "name" ||
+			field === "address" ||
+			field === "lat" ||
+			field === "lon" ||
+			field === "seats" ||
+			field === "type" ||
+			field === "furniture" ||
+			field === "href"
+		);
+	}
 }
 
 export function isMkey(mkey: unknown): mkey is Mkey {

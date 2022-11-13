@@ -11,7 +11,11 @@ chai.use(chaiAsPromised);
 describe("Integration", function () {
 	let facade: InsightFacade;
 
-	before(async function () {
+	before(function () {
+		clearDisk();
+	});
+
+	afterEach(function () {
 		clearDisk();
 	});
 

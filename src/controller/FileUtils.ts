@@ -45,6 +45,14 @@ export function loadDataset(id: string): Promise<IDataset> {
 	}
 }
 
+export async function unlinkDataset(id: string) {
+	await fs.unlink(persistDir + id + ".JSON", (err) => {
+		if (err) {
+			throw err;
+		}
+	});
+}
+
 export function loadIds(): Promise<string[]> {
 	return fs.readJson(persistDir + "ids" + ".JSON").then(
 		(ids) => {

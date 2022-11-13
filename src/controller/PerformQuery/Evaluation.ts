@@ -14,30 +14,34 @@ import {Query, Filter, Mkey, Skey} from "./Query";
  * Will throw ResultTooLargeError if length > 5000
  */
 export function evaluateQuery(dataset: SectionsDataset, query: Query): InsightResult[] {
+	const maxResultLength: number = 5000;
 	let filteredSections: Section[];
 	if (Object.values(query.WHERE).length === 0) {
 		filteredSections = dataset.sections;
 	} else {
 		filteredSections = evaluateFilter(dataset.sections, query.WHERE);
 	}
-	if (filteredSections.length > 5000) {
+	if (filteredSections.length > maxResultLength) {
 		throw new ResultTooLargeError(filteredSections.length + " found sections");
 	}
 	let results: InsightResult[] = sectionsToInsightResults(filteredSections, dataset.id, query.OPTIONS.COLUMNS);
-	if (query.OPTIONS.ORDER) {
-		let fieldToOrder: string = dataset.id + "_" + query.OPTIONS.ORDER;
+	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
+	return results;
+}
+
+function sortResultsBy(order: string | undefined, results: InsightResult[], id: string) {
+	if (order) {
+		let field: string = id + "_" + order;
 		results.sort((a, b) => {
-			if (a[fieldToOrder] < b[fieldToOrder]) {
+			if (a[field] < b[field]) {
 				return -1;
 			}
-			if (a[fieldToOrder] > b[fieldToOrder]) {
+			if (a[field] > b[field]) {
 				return 1;
 			}
-
 			return 0;
 		});
 	}
-	return results;
 }
 
 function evaluateFilter(sections: Section[], filter: Filter): Section[] {
@@ -46,7 +50,6 @@ function evaluateFilter(sections: Section[], filter: Filter): Section[] {
 		result = sections;
 		for (const f of filter.AND) {
 			let temp: Section[] = evaluateFilter(result, f as Filter);
-			// referenced https://stackoverflow.com/a/43820518 to reduce time complexity
 			result = result.filter(Set.prototype.has, new Set(temp));
 		}
 	} else if (filter.OR) {
@@ -56,16 +59,16 @@ function evaluateFilter(sections: Section[], filter: Filter): Section[] {
 			result = [...new Set([...temp, ...result])];
 		}
 	} else if (filter.LT) {
-		let key: string = getMfield(filter.LT);
+		let key: string = getField(filter.LT);
 		result = sections.filter((section) => section[key as keyof Section] < filter.LT[key as keyof Mkey]);
 	} else if (filter.GT) {
-		let key: string = getMfield(filter.GT);
+		let key: string = getField(filter.GT);
 		result = sections.filter((section) => section[key as keyof Section] > filter.GT[key as keyof Mkey]);
 	} else if (filter.EQ) {
-		let key: string = getMfield(filter.EQ);
+		let key: string = getField(filter.EQ);
 		result = sections.filter((section) => section[key as keyof Section] === filter.EQ[key as keyof Mkey]);
 	} else if (filter.IS) {
-		let key: string = getSfield(filter.IS);
+		let key: string = getField(filter.IS);
 		result = sections.filter((section) => {
 			return isMatch(section[key as keyof Section] as unknown as string, filter.IS[key as keyof Skey]);
 		});
@@ -113,32 +116,11 @@ function isMatch(field: string, comparator: string): boolean {
 	}
 }
 
-function getMfield(key: Mkey): string {
-	if (key.audit) {
-		return "audit";
-	} else if (key.avg) {
-		return "avg";
-	} else if (key.fail) {
-		return "fail";
-	} else if (key.pass) {
-		return "pass";
-	} else if (key.year) {
-		return "year";
-	}
-	throw new Error("Invalid state.");
-}
-
-function getSfield(key: Skey): string {
-	if (key.dept) {
-		return "dept";
-	} else if (key.id) {
-		return "id";
-	} else if (key.instructor) {
-		return "instructor";
-	} else if (key.title) {
-		return "title";
-	} else if (key.uuid) {
-		return "uuid";
+function getField(key: Mkey | Skey): string {
+	for (const [k,v] of Object.entries(key)) {
+		if (v !== undefined) {
+			return k;
+		}
 	}
 	throw new Error("Invalid state.");
 }

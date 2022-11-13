@@ -13,7 +13,7 @@ import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation
 import {isValidId} from "./Helpers";
 import * as AD from "./AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
-import {loadDataset, saveDataset, saveIds, updateIds} from "./FileUtils";
+import {saveDataset, saveIds, loadDataset, loadIds, updateIds, unlinkDataset} from "./FileUtils";
 import * as fs from "fs";
 
 /**
@@ -49,34 +49,29 @@ export default class InsightFacade implements IInsightFacade {
 				if (this.currentIds.includes(id)) {
 					return Promise.reject(new InsightError("dataset with same id has already been added"));
 				}
-
 				return JSZip.loadAsync(content, {base64: true});
 			})
 			.then((zip) => {
-				if (kind === InsightDatasetKind.Sections) {
-					let [promises, zipContent] = AD.zipToContent(zip);
-					return Promise.all(promises).then(async () => {
-						let sections: Section[] = [];
-						for (const zc of zipContent) {
-							if (zc.content === "") {
-								continue;
-							}
-							let results: AD.Result[] = (JSON.parse(zc.content) as AD.Content).result;
-							if (results.length > 0) {
-								sections = sections.concat(AD.resultsToSections(results));
-							}
+				let [promises, zipContent] = AD.zipToContent(zip);
+				return Promise.all(promises).then(async () => {
+					let sections: Section[] = [];
+					for (const zc of zipContent) {
+						if (zc.content === "") {
+							continue;
 						}
-						this.currentDataset = new SectionsDataset(id, kind, sections.length, sections);
-						if (sections.length < 1) {
-							return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
+						let results: AD.Result[] = (JSON.parse(zc.content) as AD.Content).result;
+						if (results.length > 0) {
+							sections = sections.concat(AD.resultsToSections(results));
 						}
-						(this.currentIds as string[]).push(id);
-						await saveDataset(this.currentDataset);
-						await saveIds(this.currentIds as string[]);
-					});
-				} else if (kind === InsightDatasetKind.Rooms){
-					console.log(zip);
-				}
+					}
+					this.currentDataset = new SectionsDataset(id, kind, sections.length, sections);
+					if (sections.length < 1) {
+						return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
+					}
+					(this.currentIds as string[]).push(id);
+					await saveDataset(this.currentDataset);
+					await saveIds(this.currentIds as string[]);
+				});
 			})
 			.then(() => {
 				return Promise.resolve(this.currentIds || []);
@@ -89,18 +84,13 @@ export default class InsightFacade implements IInsightFacade {
 			if (!isValidId(id)) {
 				return Promise.reject(new InsightError("id is not valid"));
 			}
-			if (!ids.includes(id)) {
-				return Promise.reject(new NotFoundError("dataset with id not found"));
-			}
 			if (this.currentIds?.includes(id)) {
 				let index = this.currentIds?.indexOf(id);
 				this.currentIds?.splice(index, 1);
+			} else {
+				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-			await fs.unlink("./data/" + id + ".JSON", (err) => {
-				if (err) {
-					throw err;
-				}
-			});
+			await unlinkDataset(id);
 			await saveIds(this.currentIds as string[]);
 			return Promise.resolve(id);
 		});
@@ -120,27 +110,32 @@ export default class InsightFacade implements IInsightFacade {
 		query = JSON.parse(queryString);
 
 		if (isQuery(query)) {
-			try {
-				validateQuery(query);
-			} catch (err) {
-				console.log((err as Error).message);
-				return Promise.reject(err);
-			}
 			if (this.currentDataset !== null && this.currentDataset.id === id) {
+				try {
+					validateQuery(query, this.currentDataset.kind);
+				} catch (err) {
+					console.log((err as Error).message);
+					return Promise.reject(err);
+				}
 				return Promise.resolve(evaluateQuery(this.currentDataset as SectionsDataset, query as Query));
 			} else {
 				return updateIds(this.currentIds).then(() => {
-					// containsId();
-					return loadDataset(id).then(
-						(dataset) => {
-							this.currentDataset = dataset;
-							return evaluateQuery(this.currentDataset as SectionsDataset, query as Query);
-						},
-						(err) => {
+					return loadDataset(id);
+				}).then(
+					(dataset) => {
+						this.currentDataset = dataset;
+						try {
+							validateQuery(query as Query, this.currentDataset.kind);
+						} catch (err) {
+							console.log((err as Error).message);
 							return Promise.reject(err);
 						}
-					);
-				});
+						return evaluateQuery(this.currentDataset as SectionsDataset, query as Query);
+					},
+					(err) => {
+						return Promise.reject(err);
+					}
+				);
 			}
 		} else {
 			return Promise.reject(new InsightError("Query given is not a valid query"));

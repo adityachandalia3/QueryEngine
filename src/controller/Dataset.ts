@@ -77,4 +77,3 @@ export class RoomsDataset implements IDataset {
 		return {id: this.id, kind: this.kind, numRows: this.numRows};
 	}
 }
-

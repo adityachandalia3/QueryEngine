@@ -132,12 +132,6 @@ describe("InsightFacade", function () {
 					return expect(result).eventually.to.be.rejectedWith(InsightError);
 				});
 
-				// it("should reject dataset of rooms", function () {
-				// 	const result = facade.addDataset("rooms", content, InsightDatasetKind.Rooms);
-				//
-				// 	return expect(result).eventually.to.be.rejectedWith(InsightError);
-				// });
-
 				it("should reject if sections dataset is not JSON", function () {
 					const content1 = getContentFromArchives("CPSC210.zip");
 					return expect(facade.addDataset
