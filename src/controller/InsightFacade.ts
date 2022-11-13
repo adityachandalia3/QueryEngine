@@ -48,9 +48,6 @@ export default class InsightFacade implements IInsightFacade {
 				if (this.currentIds.includes(id)) {
 					return Promise.reject(new InsightError("dataset with same id has already been added"));
 				}
-				if (kind === InsightDatasetKind.Rooms) {
-					return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
-				}
 				return JSZip.loadAsync(content, {base64: true});
 			})
 			.then((zip) => {

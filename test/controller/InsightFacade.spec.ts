@@ -132,11 +132,6 @@ describe("InsightFacade", function () {
 					return expect(result).eventually.to.be.rejectedWith(InsightError);
 				});
 
-				// it("should reject dataset of rooms", function () {
-				// 	const result = facade.addDataset("rooms", content, InsightDatasetKind.Rooms);
-				//
-				// 	return expect(result).eventually.to.be.rejectedWith(InsightError);
-				// });
 
 				it("should reject if sections dataset is not JSON", function () {
 					const content1 = getContentFromArchives("CPSC210.zip");
@@ -508,7 +503,7 @@ describe("InsightFacade", function () {
 					expect(insightDatasets).to.have.length(1);
 				});
 
-			});2
+			});
 
 			describe("Remove for rooms and sections together", function () {
 
@@ -686,7 +681,7 @@ describe("InsightFacade", function () {
 							},
 						]);
 					});
-			})
+			});
 
 			it("should list multiple datasets of type rooms only ", function (){
 				fs.removeSync("project_team104/currentIds");
@@ -711,7 +706,7 @@ describe("InsightFacade", function () {
 							numRows: 364,
 						});
 					});
-			})
+			});
 
 			it("should list multiple datasets of type rooms and sections", function () {
 				fs.removeSync("project_team104/currentIds");
