@@ -133,6 +133,8 @@ function validateOptions(query: Query) {
  * THINGS TO CHECK
  * - add keys in group and apply to validColumns[] and check
  * - ie) all columns must be from apply or group
+ * 
+ * Maybe cant strip ids in query since some dont start with id
  */
 
 function validateTransformations(query: Query) {
@@ -140,14 +142,37 @@ function validateTransformations(query: Query) {
 		return;
 	}
 	// transformation must have group and apply
-	if (query.TRANSFORMATIONS.APPLY === undefined && query.TRANSFORMATIONS.GROUP === undefined) {
+	if (query.TRANSFORMATIONS.APPLY === undefined || query.TRANSFORMATIONS.GROUP === undefined) {
 		throw new InsightError("TRANSFORMATIONS must have GROUP and APPLY");
 	}
-	// group must have at least one key
-		// key is mkey or skey
-	// apply may have 0 or more rules
-		// apply key must not have underscore
 
+	// group must have at least one key
+	if (Object.prototype.toString.call(query.TRANSFORMATIONS.GROUP) !== '[object Array]' ||
+	query.TRANSFORMATIONS.GROUP.length === 0) {
+		throw new InsightError("GROUP must be a non-empty array");
+	}
+
+	// key is mkey or skey
+	for (const k of query.TRANSFORMATIONS.GROUP) {
+		if (!isField(k)) {
+			throw new InsightError("Key is not a valid key");
+		}
+	}
+	// apply may have 0 or more rules
+	if (Object.prototype.toString.call(query.TRANSFORMATIONS.APPLY) !== '[object Array]') {
+		throw new InsightError("APPLY must be an array");
+	}
+
+	// apply key must not have underscore
+	for (const rule of query.TRANSFORMATIONS.APPLY) {
+		for (const key of Object.keys(rule)) {
+			for (const token of Object.keys(key)) {
+				if (token !== undefined && token.includes("_")) {
+					throw new InsightError("Key is not a valid key");
+				}
+			}
+		}
+	}
 }
 
 export function isQuery(query: unknown): query is Query {

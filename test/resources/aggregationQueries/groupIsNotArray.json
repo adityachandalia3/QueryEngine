@@ -1,9 +1,10 @@
 {
-	"title": "transformationMissingGroup",
+	"title": "groupIsNotArray",
 	"input": {
 		"WHERE": {},
 		"OPTIONS": {
 			"COLUMNS": [
+				"sections_title",
 				"overallAvg"
 			]
 		},
@@ -14,7 +15,8 @@
 						"AVG": "sections_avg"
 					}
 				}
-			]
+			],
+			"GROUP": {}
 		}
 	},
 	"errorExpected": true,

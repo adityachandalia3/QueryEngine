@@ -21,11 +21,13 @@ describe("QueryRoomsAndAggregation", function () {
 	const persistDirectory = "./data";
 	const datasetContents = new Map<string, string>();
 	let content: string;
+	let roomContent: string;
 
 	// Reference any datasets you've added to test/resources/archives here and they will
 	// automatically be loaded in the 'before' hook.
 	const datasetsToLoad: {[key: string]: string} = {
 		sections: "./test/resources/archives/pair.zip",
+		rooms: "./test/resources/archives/rooms.zip"
 	};
 
 	before(function () {
@@ -38,6 +40,7 @@ describe("QueryRoomsAndAggregation", function () {
 		fs.removeSync(persistDirectory);
 
 		content = datasetContents.get("sections") ?? "";
+		roomContent = datasetContents.get("rooms") ?? "";
 	});
 
 	describe("roomQueries", () => {
@@ -50,7 +53,8 @@ describe("QueryRoomsAndAggregation", function () {
 			// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
-				facade.addDataset("sections", datasetContents.get("sections") ?? "", InsightDatasetKind.Sections),
+				facade.addDataset("sections", content, InsightDatasetKind.Sections),
+				// facade.addDataset("rooms", roomContent, InsightDatasetKind.Sections),
 			];
 
 			return Promise.all(loadDatasetPromises);
@@ -95,7 +99,8 @@ describe("QueryRoomsAndAggregation", function () {
 			// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
-				facade.addDataset("sections", datasetContents.get("sections") ?? "", InsightDatasetKind.Sections),
+				facade.addDataset("sections", content, InsightDatasetKind.Sections),
+				// facade.addDataset("rooms", roomContent, InsightDatasetKind.Sections),
 			];
 
 			return Promise.all(loadDatasetPromises);

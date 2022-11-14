@@ -3,11 +3,24 @@ export interface Query {
 	OPTIONS: {
 		COLUMNS: string[];
 		ORDER?: string;
+		// TODO: sort
 	};
 	TRANSFORMATIONS: {
 		GROUP: string[];
-		APPLY: string;
+		APPLY: Rule[];
 	}
+}
+
+export interface Rule {
+	[key:string]: ApplyKey;
+}
+
+export interface ApplyKey {
+	MAX: string;
+	MIN: string;
+	AVG: string;
+	COUNT: string;
+	SUM: string;
 }
 
 export interface Filter {
