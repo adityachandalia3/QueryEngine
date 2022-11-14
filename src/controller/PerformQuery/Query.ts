@@ -12,7 +12,7 @@ export interface Query {
 }
 
 export interface Rule {
-	[key:string]: ApplyKey;
+	[key: string]: ApplyKey;
 }
 
 export interface ApplyKey {

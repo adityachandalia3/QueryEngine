@@ -133,7 +133,7 @@ function validateOptions(query: Query) {
  * THINGS TO CHECK
  * - add keys in group and apply to validColumns[] and check
  * - ie) all columns must be from apply or group
- * 
+ *
  * Maybe cant strip ids in query since some dont start with id
  */
 
@@ -147,7 +147,7 @@ function validateTransformations(query: Query) {
 	}
 
 	// group must have at least one key
-	if (Object.prototype.toString.call(query.TRANSFORMATIONS.GROUP) !== '[object Array]' ||
+	if (Object.prototype.toString.call(query.TRANSFORMATIONS.GROUP) !== "[object Array]" ||
 	query.TRANSFORMATIONS.GROUP.length === 0) {
 		throw new InsightError("GROUP must be a non-empty array");
 	}
@@ -159,7 +159,7 @@ function validateTransformations(query: Query) {
 		}
 	}
 	// apply may have 0 or more rules
-	if (Object.prototype.toString.call(query.TRANSFORMATIONS.APPLY) !== '[object Array]') {
+	if (Object.prototype.toString.call(query.TRANSFORMATIONS.APPLY) !== "[object Array]") {
 		throw new InsightError("APPLY must be an array");
 	}
 
