@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import {IDataset, RoomsDataset, Section, SectionsDataset} from "./Dataset";
+import {IDataset, Room, RoomsDataset, Section, SectionsDataset} from "./Dataset";
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 
 export interface Content {
@@ -38,7 +38,42 @@ export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> 
 }
 
 export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
-	return Promise.reject("TODO");
+	let index = zip.file("index.htm");
+	if (index == null) {
+		return Promise.reject(new InsightError("No file named index.htm"));
+	}
+	index.async("string").then((idx) => {
+		// idx is index.htm as a string
+		// console.log(idx);
+	});
+
+	let buildings = zip.folder("campus/discover/buildings-and-classrooms");
+	if (buildings === null) {
+		return Promise.reject(new InsightError("No directory named campus/discover/buildings-and-classrooms"));
+	}
+
+	const zipContent: any[] = [];
+	const promises: any[] = [];
+	buildings.forEach(async (relativePath, file) => {
+		const promise = file.async("string");
+		promises.push(promise);
+		zipContent.push({file: relativePath, content: await promise});
+	});
+
+	return Promise.all(promises).then(() => {
+		let rooms: Room[] = [];
+		for (const zc of zipContent) {
+			if (zc.content === "") {
+				continue;
+			}
+			// TODO parse zc.content into a result
+			let results: Result[] = [];
+			if (results.length > 0) {
+				rooms = rooms.concat(resultsToRooms(results));
+			}
+		}
+		return new RoomsDataset(id, rooms.length, rooms);
+	});
 }
 
 function zipToContent(zip: JSZip): any[] {
@@ -57,7 +92,12 @@ function zipToContent(zip: JSZip): any[] {
 	return [promises, zipContent];
 }
 
-export function resultsToSections(results: Result[]): Section[] {
+function resultsToRooms(results: Result[]): Room[] {
+	// TODO
+	return [];
+}
+
+function resultsToSections(results: Result[]): Section[] {
 	let sections: Section[] = [];
 	for (const result of results) {
 		if (result.Section === "overall") {
