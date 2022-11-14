@@ -49,6 +49,7 @@ export function checkAndStripId(query: string): [string, string] {
  */
 export function validateQuery(query: Query, kind: InsightDatasetKind) {
 	isSections = kind === InsightDatasetKind.Sections;
+	validateTransformations(query);
 	if (Object.values(query.WHERE).length === 1) {
 		validateFilter(query.WHERE);
 	} else if (Object.values(query.WHERE).length > 1) {
@@ -99,7 +100,7 @@ export function validateFilter(filter: Filter) {
 	}
 }
 
-export function validateOptions(query: Query) {
+function validateOptions(query: Query) {
 	if (!Array.isArray(query.OPTIONS.COLUMNS) || query.OPTIONS.COLUMNS.length === 0) {
 		throw new InsightError("COLUMNS must be a non-empty array");
 	}
@@ -126,6 +127,27 @@ export function validateOptions(query: Query) {
 			throw new InsightError("ORDER key must be in COLUMNS");
 		}
 	}
+}
+/**
+ *
+ * THINGS TO CHECK
+ * - add keys in group and apply to validColumns[] and check
+ * - ie) all columns must be from apply or group
+ */
+
+function validateTransformations(query: Query) {
+	if (query.TRANSFORMATIONS === undefined) {
+		return;
+	}
+	// transformation must have group and apply
+	if (query.TRANSFORMATIONS.APPLY === undefined && query.TRANSFORMATIONS.GROUP === undefined) {
+		throw new InsightError("TRANSFORMATIONS must have GROUP and APPLY");
+	}
+	// group must have at least one key
+		// key is mkey or skey
+	// apply may have 0 or more rules
+		// apply key must not have underscore
+
 }
 
 export function isQuery(query: unknown): query is Query {

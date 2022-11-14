@@ -4,6 +4,10 @@ export interface Query {
 		COLUMNS: string[];
 		ORDER?: string;
 	};
+	TRANSFORMATIONS: {
+		GROUP: string[];
+		APPLY: string;
+	}
 }
 
 export interface Filter {
