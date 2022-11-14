@@ -146,7 +146,7 @@ describe("InsightFacade", function () {
 					const id: string = "rooms";
 					const expected: string[] = [id];
 					return facade
-						.addDataset(id,roomsContent,InsightDatasetKind.Rooms)
+						.addDataset(id, roomsContent, InsightDatasetKind.Rooms)
 						.then((result: string[]) => {
 							expect(result).to.deep.equal(expected);
 						});

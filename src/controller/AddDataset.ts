@@ -1,6 +1,6 @@
 import JSZip from "jszip";
-import {Section} from "./Dataset";
-import {InsightError} from "./IInsightFacade";
+import {IDataset, RoomsDataset, Section, SectionsDataset} from "./Dataset";
+import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 
 export interface Content {
 	result: Result[];
@@ -20,7 +20,28 @@ export interface Result {
 	Section: string;
 }
 
-export function zipToContent(zip: JSZip): any[] {
+export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> {
+	let [promises, zipContent] = zipToContent(zip);
+	return Promise.all(promises).then(async () => {
+		let sections: Section[] = [];
+		for (const zc of zipContent) {
+			if (zc.content === "") {
+				continue;
+			}
+			let results: Result[] = (JSON.parse(zc.content) as Content).result;
+			if (results.length > 0) {
+				sections = sections.concat(resultsToSections(results));
+			}
+		}
+		return new SectionsDataset(id, sections.length, sections);
+	});
+}
+
+export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
+	return Promise.reject("TODO");
+}
+
+function zipToContent(zip: JSZip): any[] {
 	if (zip.folder("courses") === null) {
 		return [Promise.reject(new InsightError("No directory named courses"))];
 	} else {

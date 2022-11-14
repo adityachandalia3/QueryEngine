@@ -39,7 +39,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-
 		return updateIds(this.currentIds)
 			.then((ids) => {
 				this.currentIds = ids;
@@ -52,28 +51,20 @@ export default class InsightFacade implements IInsightFacade {
 				return JSZip.loadAsync(content, {base64: true});
 			})
 			.then((zip) => {
-				let [promises, zipContent] = AD.zipToContent(zip);
-				return Promise.all(promises).then(async () => {
-					let sections: Section[] = [];
-					for (const zc of zipContent) {
-						if (zc.content === "") {
-							continue;
-						}
-						let results: AD.Result[] = (JSON.parse(zc.content) as AD.Content).result;
-						if (results.length > 0) {
-							sections = sections.concat(AD.resultsToSections(results));
-						}
-					}
-					this.currentDataset = new SectionsDataset(id, kind, sections.length, sections);
-					if (sections.length < 1) {
-						return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
-					}
-					(this.currentIds as string[]).push(id);
-					await saveDataset(this.currentDataset);
-					await saveIds(this.currentIds as string[]);
-				});
+				if (kind === InsightDatasetKind.Rooms) {
+					return AD.zipToRoomsDataset(zip, id);
+				} else {
+					return AD.zipToSectionsDataset(zip, id);
+				}
 			})
-			.then(() => {
+			.then(async (dataset) => {
+				if (dataset.numRows < 1) {
+					return Promise.reject(new InsightError("Dataset Contains less than one valid section/room!"));
+				}
+				this.currentDataset = dataset;
+				(this.currentIds as string[]).push(id);
+				await saveDataset(dataset);
+				await saveIds(this.currentIds as string[]);
 				return Promise.resolve(this.currentIds || []);
 			});
 	}

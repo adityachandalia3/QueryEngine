@@ -48,9 +48,9 @@ export class SectionsDataset implements IDataset {
 	public readonly numRows: number;
 	public readonly sections: Section[];
 
-	constructor(id: string, kind: InsightDatasetKind, numRows: number, sections: Section[]) {
+	constructor(id: string, numRows: number, sections: Section[]) {
 		this.id = id;
-		this.kind = kind;
+		this.kind = InsightDatasetKind.Sections;
 		this.numRows = numRows;
 		this.sections = sections;
 	}
@@ -66,9 +66,9 @@ export class RoomsDataset implements IDataset {
 	public readonly numRows: number;
 	public readonly rooms: Room[];
 
-	constructor(id: string, kind: InsightDatasetKind, numRows: number, rooms: Room[]) {
+	constructor(id: string, numRows: number, rooms: Room[]) {
 		this.id = id;
-		this.kind = kind;
+		this.kind = InsightDatasetKind.Rooms;
 		this.numRows = numRows;
 		this.rooms = rooms;
 	}
