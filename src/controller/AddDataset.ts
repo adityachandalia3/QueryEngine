@@ -1,6 +1,8 @@
 import JSZip from "jszip";
 import {IDataset, Room, RoomsDataset, Section, SectionsDataset} from "./Dataset";
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
+import {parse, defaultTreeAdapter} from "parse5";
+import {SearchNode} from "./Helpers";
 
 export interface Content {
 	result: Result[];
@@ -43,6 +45,53 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
 		return Promise.reject(new InsightError("No file named index.htm"));
 	}
 	index.async("string").then((idx) => {
+		let document = parse(idx);
+		console.log(SearchNode(defaultTreeAdapter.getChildNodes(document)));
+		// for (const child of document.childNodes){
+		// 	if (child.nodeName === "html"){
+		// 		for (const child2 of child.childNodes){
+		// 			if(child2.nodeName === "body"){
+		// 				for(const child3 of child2.childNodes){
+		// 					if(child3.nodeName === "div" && child3.childNodes.length === 13){
+		// 						for(const child4 of child3.childNodes){
+		// 							if (child4.nodeName ===  "div" && child4.childNodes.length === 6 &&
+		// 								child4.attrs.length === 2){
+		// 								console.log(child4)
+		// 								for(const child5 of child4.childNodes){
+		// 									if (child5.nodeName === "div" && child5.childNodes.length === 7){
+		// 										for(const child6 of child5.childNodes){
+		// 											if(child6.nodeName === "section" && child6.childNodes.length === 3){
+		// 												for(const child7 of child6.childNodes){
+		// 													if(child7.nodeName === "div" &&
+		// 														child7.childNodes.length === 7){
+		// 														for(const child8 of child7.childNodes){
+		// 															if (child8.nodeName === "div" &&
+		// 																child8.childNodes.length === 3){
+		// 																for(const child9 of child8.childNodes){
+		// 																	if(child9.nodeName === "table"){
+		// 																		console.log(child9.childNodes);
+		// 																	}
+		// 																}
+		// 															}
+		// 														}
+		//
+		// 													}
+		// 												}
+		// 											}
+		// 										}
+		// 									}
+		// 								}
+		// 							}
+		// 						}
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
+		//
+
+
 		// idx is index.htm as a string
 		// console.log(idx);
 	});
