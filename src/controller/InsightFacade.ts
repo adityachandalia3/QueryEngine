@@ -15,6 +15,8 @@ import * as AD from "./AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
 import {saveDataset, saveIds, loadDataset, loadIds, updateIds, unlinkDataset} from "./FileUtils";
 import * as fs from "fs";
+import {html, parse} from "parse5";
+
 
 /**
  * This is the main programmatic entry point for the project.

@@ -23,6 +23,7 @@
 		"@types/fs-extra": "9.0.13",
 		"@types/mocha": "9.0.0",
 		"@types/node": "18.7.16",
+		"@types/parse5": "^7.0.0",
 		"@typescript-eslint/eslint-plugin": "5.9.0",
 		"@typescript-eslint/parser": "5.9.0",
 		"@ubccpsc310/folder-test": "2.0.1",
