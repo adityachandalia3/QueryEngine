@@ -1,9 +1,7 @@
 import JSZip from "jszip";
 import {IDataset, Room, RoomsDataset, Section, SectionsDataset} from "./Dataset";
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
-import {parse} from "parse5";
-import {defaultTreeAdapter} from "parse5";
-import doc = Mocha.reporters.doc;
+import {parse, defaultTreeAdapter} from "parse5";
 import {SearchNode} from "./Helpers";
 
 export interface Content {
@@ -48,20 +46,8 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
 	}
 	index.async("string").then((idx) => {
 		let document = parse(idx);
-		console.log(SearchNode(defaultTreeAdapter.getChildNodes(document)));
-
-
-
-
-
-
-
-
-
-
-
-
-
+		console.log(defaultTreeAdapter.getChildNodes(document))
+		//console.log(SearchNode(defaultTreeAdapter.getChildNodes(document)));
 
 		// for (const child of document.childNodes){
 		// 	if (child.nodeName === "html"){

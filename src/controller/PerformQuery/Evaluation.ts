@@ -1,6 +1,6 @@
 import {SectionsDataset, Section} from "../Dataset";
 import {InsightError, InsightResult, ResultTooLargeError} from "../IInsightFacade";
-import {Query, Filter, Mkey, Skey} from "./Query";
+import {Query, Filter, Mkey, Skey, Sort} from "./Query";
 
 /**
  * Apply query to dataset and return result
@@ -29,7 +29,7 @@ export function evaluateQuery(dataset: SectionsDataset, query: Query): InsightRe
 	return results;
 }
 
-function sortResultsBy(order: string | undefined, results: InsightResult[], id: string) {
+function sortResultsBy(order: string | Sort | undefined, results: InsightResult[], id: string) {
 	if (order) {
 		let field: string = id + "_" + order;
 		results.sort((a, b) => {

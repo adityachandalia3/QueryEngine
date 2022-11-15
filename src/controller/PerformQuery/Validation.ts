@@ -1,9 +1,10 @@
 import {isValidId} from "../Helpers";
 import {InsightDatasetKind, InsightError, InsightResult} from "../IInsightFacade";
-import {Filter, Mkey, Query, Skey} from "./Query";
+import {ApplyBody, Filter, Mkey, Query, Skey} from "./Query";
 import {SectionsDataset, Section} from "../Dataset";
 
 let isSections: boolean;
+let transformationKeys: string[];
 
 /**
  * Returns id and query with id stripped.
@@ -49,11 +50,22 @@ export function checkAndStripId(query: string): [string, string] {
  */
 export function validateQuery(query: Query, kind: InsightDatasetKind) {
 	isSections = kind === InsightDatasetKind.Sections;
+	transformationKeys = [];
+
+	for (const k of Object.keys(query)) {
+		if (k !== "WHERE" && k !== "OPTIONS" && k !== "TRANSFORMATIONS") {
+			throw new InsightError("Invalid keys in query");
+		}
+	}
+
+	validateTransformations(query);
+
 	if (Object.values(query.WHERE).length === 1) {
 		validateFilter(query.WHERE);
 	} else if (Object.values(query.WHERE).length > 1) {
 		throw new InsightError("WHERE should only have 1 key");
 	}
+
 	validateOptions(query);
 }
 
@@ -99,31 +111,96 @@ export function validateFilter(filter: Filter) {
 	}
 }
 
-export function validateOptions(query: Query) {
+function validateOptions(query: Query) {
 	if (!Array.isArray(query.OPTIONS.COLUMNS) || query.OPTIONS.COLUMNS.length === 0) {
 		throw new InsightError("COLUMNS must be a non-empty array");
 	}
-	for (const k of Object.keys(query)) {
-		if (k !== "WHERE" && k !== "OPTIONS") {
-			throw new InsightError("Invalid keys in query");
-		}
-	}
+
 	for (const k of Object.keys(query.OPTIONS)) {
 		if (k !== "COLUMNS" && k !== "ORDER") {
 			throw new InsightError("Invalid keys in OPTIONS");
 		}
 	}
-	for (const i in query.OPTIONS.COLUMNS) {
-		if (!isField(query.OPTIONS.COLUMNS[i])) {
-			throw new InsightError("Invalid key in COLUMNS");
+	if (transformationKeys.length === 0) {
+		for (const i in query.OPTIONS.COLUMNS) {
+			if (!isKey(query.OPTIONS.COLUMNS[i])) {
+				throw new InsightError("Invalid key in COLUMNS");
+			}
+		}
+	} else {
+		for (const i in query.OPTIONS.COLUMNS) {
+			if (!transformationKeys.includes(query.OPTIONS.COLUMNS[i])) {
+				throw new InsightError("Keys in COLUMNS must be in GROUP or APPLY");
+			}
 		}
 	}
 	if (query.OPTIONS.ORDER !== undefined) {
-		if (!isField(query.OPTIONS.ORDER)) {
-			throw new InsightError("Invalid ORDER type");
+		if (typeof query.OPTIONS.ORDER === "string") {
+			if (!query.OPTIONS.COLUMNS.includes(query.OPTIONS.ORDER)) {
+				throw new InsightError("ORDER key must be in COLUMNS");
+			}
+		} else {
+			let dir = query.OPTIONS.ORDER.dir;
+			if (typeof dir !== "string" || (dir !== "UP" && dir !== "DOWN")) {
+				throw new InsightError("ORDER dir must be either UP or DOWN");
+			}
+			let keys = query.OPTIONS.ORDER.keys;
+			if (!Array.isArray(keys) || keys.length === 0) {
+				throw new InsightError("ORDER keys must be a non-empty array");
+			}
 		}
-		if (!query.OPTIONS.COLUMNS.includes(query.OPTIONS.ORDER)) {
-			throw new InsightError("ORDER key must be in COLUMNS");
+	}
+}
+
+function validateTransformations(query: Query) {
+	if (query.TRANSFORMATIONS === undefined) {
+		return;
+	}
+	// transformation must have group and apply
+	if (query.TRANSFORMATIONS.APPLY === undefined || query.TRANSFORMATIONS.GROUP === undefined) {
+		throw new InsightError("TRANSFORMATIONS must have GROUP and APPLY");
+	}
+
+	// group must have at least one key
+	if (!Array.isArray(query.TRANSFORMATIONS.GROUP) ||
+		query.TRANSFORMATIONS.GROUP.length === 0) {
+		throw new InsightError("GROUP must be a non-empty array");
+	}
+
+	// key is mkey or skey
+	for (const k of query.TRANSFORMATIONS.GROUP) {
+		if (!isKey(k)) {
+			throw new InsightError("Key is not a valid key");
+		}
+		transformationKeys.push(k);
+	}
+	// apply may have 0 or more rules
+	if (!Array.isArray(query.TRANSFORMATIONS.APPLY)) {
+		throw new InsightError("APPLY must be an array");
+	}
+
+	for (const rule of query.TRANSFORMATIONS.APPLY) {
+		if (Object.keys(rule).length !== 1) {
+			throw new InsightError("APPLY rule should only have 1 key");
+		}
+
+		let anykey = Object.keys(rule)[0];
+		let body = Object.values(rule)[0];
+		if (transformationKeys.includes(anykey)) {
+			throw new InsightError("Duplicate APPLY key");
+		}
+		transformationKeys.push(anykey);
+		if (Object.keys(body).length !== 1) {
+			throw new InsightError("APPLY body should only have 1 key");
+		}
+
+		let token = Object.keys(body)[0];
+		let key = Object.values(body)[0];
+		if (!isToken(token)) {
+			throw new InsightError("Invalid transformation operator");
+		}
+		if (!isKey(key)) {
+			throw new InsightError("Invalid key " + key + " in " + token);
 		}
 	}
 }
@@ -140,7 +217,15 @@ export function isQuery(query: unknown): query is Query {
 	);
 }
 
-export function isField(field: string): boolean {
+function isToken(token: string): boolean {
+	return token === "MAX" ||
+		   token === "MIN" ||
+		   token === "AVG" ||
+		   token === "COUNT" ||
+		   token === "SUM";
+}
+
+export function isKey(field: string): boolean {
 	if (isSections) {
 		return (
 			field === "avg" ||

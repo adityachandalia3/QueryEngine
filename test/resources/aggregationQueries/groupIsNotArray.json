@@ -1,0 +1,24 @@
+{
+	"title": "groupIsNotArray",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"overallAvg"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "sections_avg"
+					}
+				}
+			],
+			"GROUP": {}
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

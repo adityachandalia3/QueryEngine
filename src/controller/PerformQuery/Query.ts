@@ -2,8 +2,29 @@ export interface Query {
 	WHERE: Filter;
 	OPTIONS: {
 		COLUMNS: string[];
-		ORDER?: string;
+		ORDER?: string | Sort;
 	};
+	TRANSFORMATIONS: {
+		GROUP: string[];
+		APPLY: ApplyRule[];
+	}
+}
+
+export interface Sort {
+	dir: string;
+	keys: string[]; // anykey = key or applykey
+}
+
+export interface ApplyRule {
+	[key: string]: ApplyBody;
+}
+
+export interface ApplyBody {
+	MAX: string;
+	MIN: string;
+	AVG: string;
+	COUNT: string;
+	SUM: string;
 }
 
 export interface Filter {

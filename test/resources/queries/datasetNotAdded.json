@@ -1,0 +1,13 @@
+{
+	"title": "datasetNotAdded",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"s_title"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
