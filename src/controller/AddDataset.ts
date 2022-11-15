@@ -46,9 +46,7 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
 	}
 	index.async("string").then((idx) => {
 		let document = parse(idx);
-		console.log(defaultTreeAdapter.getChildNodes(document))
-		//console.log(SearchNode(defaultTreeAdapter.getChildNodes(document)));
-
+		console.log(SearchNode(defaultTreeAdapter.getChildNodes(document)));
 		// for (const child of document.childNodes){
 		// 	if (child.nodeName === "html"){
 		// 		for (const child2 of child.childNodes){
