@@ -1,0 +1,33 @@
+{
+	"title": "invalidTransformationOperator",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"overallAvg"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					"sections_title",
+					"overallAvg"
+				]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVGa": "sections_avg"
+					}
+				}
+			],
+			"GROUP": [
+				"sections_title"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

@@ -1,10 +1,12 @@
 {
-	"title": "underscoreInApplyKey",
+	"title": "keyInColumnNotInTransformation",
 	"input": {
 		"WHERE": {},
 		"OPTIONS": {
 			"COLUMNS": [
-				"sections_title"
+				"sections_title",
+				"overallAvg",
+				"sections_avg"
 			]
 		},
 		"TRANSFORMATIONS": {
@@ -13,7 +15,7 @@
 			],
 			"APPLY": [
 				{
-					"_testtest": {
+					"overallAvg": {
 						"AVG": "sections_avg"
 					}
 				}

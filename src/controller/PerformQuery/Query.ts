@@ -6,7 +6,7 @@ export interface Query {
 	};
 	TRANSFORMATIONS: {
 		GROUP: string[];
-		APPLY: Rule[];
+		APPLY: ApplyRule[];
 	}
 }
 
@@ -15,11 +15,11 @@ export interface Sort {
 	keys: string[]; // anykey = key or applykey
 }
 
-export interface Rule {
-	[key: string]: ApplyKey;
+export interface ApplyRule {
+	[key: string]: ApplyBody;
 }
 
-export interface ApplyKey {
+export interface ApplyBody {
 	MAX: string;
 	MIN: string;
 	AVG: string;

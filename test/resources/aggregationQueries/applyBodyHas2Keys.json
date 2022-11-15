@@ -1,0 +1,34 @@
+{
+	"title": "applyBodyHas2Keys",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"overallAvg"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					"sections_title",
+					"overallAvg"
+				]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "sections_avg",
+						"MAX": "sections_avg"
+					}
+				}
+			],
+			"GROUP": [
+				"sections_title"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
