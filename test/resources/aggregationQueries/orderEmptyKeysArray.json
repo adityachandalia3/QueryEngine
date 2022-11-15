@@ -1,0 +1,30 @@
+{
+	"title": "orderEmptyKeysArray",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"overallAvg"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": []
+			}
+		},
+		"TRANSFORMATIONS": {
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "sections_avg"
+					}
+				}
+			],
+			"GROUP": [
+				"sections_title"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

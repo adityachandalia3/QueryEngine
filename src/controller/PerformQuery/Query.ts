@@ -2,13 +2,17 @@ export interface Query {
 	WHERE: Filter;
 	OPTIONS: {
 		COLUMNS: string[];
-		ORDER?: string;
-		// TODO: sort
+		ORDER?: string | Sort;
 	};
 	TRANSFORMATIONS: {
 		GROUP: string[];
 		APPLY: Rule[];
 	}
+}
+
+export interface Sort {
+	dir: string;
+	keys: string[]; // anykey = key or applykey
 }
 
 export interface Rule {

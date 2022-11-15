@@ -120,15 +120,33 @@ function validateOptions(query: Query) {
 		}
 	}
 	if (query.OPTIONS.ORDER !== undefined) {
-		if (!isField(query.OPTIONS.ORDER)) {
-			throw new InsightError("Invalid ORDER type");
-		}
-		if (!query.OPTIONS.COLUMNS.includes(query.OPTIONS.ORDER)) {
-			throw new InsightError("ORDER key must be in COLUMNS");
+
+		if (typeof query.OPTIONS.ORDER === "string") {
+			if (!isField(query.OPTIONS.ORDER)) {
+				throw new InsightError("Invalid ORDER type");
+			}
+			if (!query.OPTIONS.COLUMNS.includes(query.OPTIONS.ORDER)) {
+				throw new InsightError("ORDER key must be in COLUMNS");
+			}
+		} else {
+			let dir = query.OPTIONS.ORDER.dir;
+			if (typeof dir !== "string" || (dir !== "UP" && dir !== "DOWN")) {
+				throw new InsightError("ORDER dir must be either UP or DOWN");
+			}
+			let keys = query.OPTIONS.ORDER.keys;
+			if (!Array.isArray(keys) || keys.length === 0) {
+				throw new InsightError("ORDER keys must be a non-empty array");
+			}
 		}
 	}
 }
 /**
+ *
+ * Steps:
+ * unstrip
+ * deal with past id/key checking
+ * implement id/key checking for aggregation
+ * above includes (storing applykey and key)
  *
  * THINGS TO CHECK
  * - add keys in group and apply to validColumns[] and check
@@ -147,8 +165,8 @@ function validateTransformations(query: Query) {
 	}
 
 	// group must have at least one key
-	if (Object.prototype.toString.call(query.TRANSFORMATIONS.GROUP) !== "[object Array]" ||
-	query.TRANSFORMATIONS.GROUP.length === 0) {
+	if (!Array.isArray(query.TRANSFORMATIONS.GROUP) ||
+		query.TRANSFORMATIONS.GROUP.length === 0) {
 		throw new InsightError("GROUP must be a non-empty array");
 	}
 
@@ -159,7 +177,7 @@ function validateTransformations(query: Query) {
 		}
 	}
 	// apply may have 0 or more rules
-	if (Object.prototype.toString.call(query.TRANSFORMATIONS.APPLY) !== "[object Array]") {
+	if (!Array.isArray(query.TRANSFORMATIONS.APPLY)) {
 		throw new InsightError("APPLY must be an array");
 	}
 
