@@ -40,7 +40,7 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 }
 
 function sortResultsBy(order: string | Sort | undefined, results: InsightResult[], id: string) {
-	if (typeof order === 'string') {
+	if (typeof order === "string") {
 		let field: string = id + "_" + order;
 		results.sort((a, b) => {
 			if (a[field] < b[field]) {
