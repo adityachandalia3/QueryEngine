@@ -1,4 +1,4 @@
-import {SectionsDataset, Section, IDataset} from "./Dataset";
+import {SectionsDataset, Section, Dataset} from "./Dataset";
 import {
 	IInsightFacade,
 	InsightDataset,
@@ -29,7 +29,7 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 * performQuery must check if currentDataset === undefined
 	 */
-	private currentDataset: IDataset | null;
+	private currentDataset: Dataset | null;
 	private currentIds: string[] | null;
 
 	constructor() {
@@ -108,7 +108,7 @@ export default class InsightFacade implements IInsightFacade {
 					console.log((err as Error).message);
 					return Promise.reject(err);
 				}
-				return Promise.resolve(evaluateQuery(this.currentDataset as SectionsDataset, query as Query));
+				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
 			} else {
 				return updateIds(this.currentIds).then(() => {
 					return loadDataset(id);
@@ -121,7 +121,7 @@ export default class InsightFacade implements IInsightFacade {
 							console.log((err as Error).message);
 							return Promise.reject(err);
 						}
-						return evaluateQuery(this.currentDataset as SectionsDataset, query as Query);
+						return evaluateQuery(this.currentDataset as Dataset, query as Query);
 					},
 					(err) => {
 						return Promise.reject(err);
@@ -145,7 +145,7 @@ export default class InsightFacade implements IInsightFacade {
 			})
 			.then((datasets) => {
 				datasets.forEach((ds) => {
-					let dataset: IDataset = ds;
+					let dataset: Dataset = ds;
 					let res: InsightDataset = {id: dataset.id, kind: dataset.kind, numRows: dataset.numRows};
 					insightDatasets.push(res);
 				});

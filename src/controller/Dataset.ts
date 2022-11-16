@@ -27,10 +27,18 @@ export interface Room {
 	seats: number;
 }
 
-export interface IDataset extends InsightDataset {
-	readonly id: string;
-	readonly kind: InsightDatasetKind;
-	readonly numRows: number;
+export class Dataset implements InsightDataset {
+	public readonly id: string;
+	public readonly kind: InsightDatasetKind;
+	public readonly numRows: number;
+	public readonly data: any[];
+
+	constructor(id: string, kind: InsightDatasetKind, numRows: number, data: any[]) {
+		this.id = id;
+		this.kind = kind;
+		this.numRows = numRows;
+		this.data = data;
+	}
 
 	/**
 	 * Returns an InsightDataset.
@@ -39,41 +47,33 @@ export interface IDataset extends InsightDataset {
 	 *
 	 * Returns an InsightDataset type for use with InsightFacade
 	 */
-	getInsightDataset(): InsightDataset;
+	public getInsightDataset(): InsightDataset {
+		return {id: this.id, kind: this.kind, numRows: this.numRows};
+	}
+
+	public getData(): any[] {
+		return this.data;
+	}
 }
 
-export class SectionsDataset implements IDataset {
-	public readonly id: string;
-	public readonly kind: InsightDatasetKind;
-	public readonly numRows: number;
-	public readonly sections: Section[];
+export class SectionsDataset extends Dataset {
 
 	constructor(id: string, numRows: number, sections: Section[]) {
-		this.id = id;
-		this.kind = InsightDatasetKind.Sections;
-		this.numRows = numRows;
-		this.sections = sections;
+		super(id, InsightDatasetKind.Sections, numRows, sections);
 	}
 
-	public getInsightDataset(): InsightDataset {
-		return {id: this.id, kind: this.kind, numRows: this.numRows};
+	public getData(): Section[] {
+		return this.data;
 	}
 }
 
-export class RoomsDataset implements IDataset {
-	public readonly id: string;
-	public readonly kind: InsightDatasetKind;
-	public readonly numRows: number;
-	public readonly rooms: Room[];
+export class RoomsDataset extends Dataset {
 
 	constructor(id: string, numRows: number, rooms: Room[]) {
-		this.id = id;
-		this.kind = InsightDatasetKind.Rooms;
-		this.numRows = numRows;
-		this.rooms = rooms;
+		super(id, InsightDatasetKind.Rooms, numRows, rooms);
 	}
 
-	public getInsightDataset(): InsightDataset {
-		return {id: this.id, kind: this.kind, numRows: this.numRows};
+	public getData(): Room[] {
+		return this.data;
 	}
 }

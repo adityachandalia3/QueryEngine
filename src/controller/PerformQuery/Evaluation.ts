@@ -1,4 +1,4 @@
-import {SectionsDataset, Section} from "../Dataset";
+import {SectionsDataset, Section, Dataset} from "../Dataset";
 import {InsightError, InsightResult, ResultTooLargeError} from "../IInsightFacade";
 import {Query, Filter, Mkey, Skey, Sort} from "./Query";
 
@@ -13,18 +13,18 @@ import {Query, Filter, Mkey, Skey, Sort} from "./Query";
  *
  * Will throw ResultTooLargeError if length > 5000
  */
-export function evaluateQuery(dataset: SectionsDataset, query: Query): InsightResult[] {
+export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	const maxResultLength: number = 5000;
-	let filteredSections: Section[];
+	let filteredData: any[];
 	if (Object.values(query.WHERE).length === 0) {
-		filteredSections = dataset.sections;
+		filteredData = dataset.getData();
 	} else {
-		filteredSections = evaluateFilter(dataset.sections, query.WHERE);
+		filteredData = evaluateFilter(dataset.getData(), query.WHERE);
 	}
-	if (filteredSections.length > maxResultLength) {
-		throw new ResultTooLargeError(filteredSections.length + " found sections");
+	if (filteredData.length > maxResultLength) {
+		throw new ResultTooLargeError(filteredData.length + " found sections/rooms");
 	}
-	let results: InsightResult[] = sectionsToInsightResults(filteredSections, dataset.id, query.OPTIONS.COLUMNS);
+	let results: InsightResult[] = sectionsToInsightResults(filteredData, dataset.id, query.OPTIONS.COLUMNS);
 	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
 	return results;
 }

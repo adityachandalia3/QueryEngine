@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import {IDataset, Room, RoomsDataset, Section, SectionsDataset} from "./Dataset";
+import {Dataset, Room, RoomsDataset, Section, SectionsDataset} from "./Dataset";
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 
 export interface Content {
@@ -20,7 +20,7 @@ export interface Result {
 	Section: string;
 }
 
-export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> {
+export function zipToSectionsDataset(zip: JSZip, id: string): Promise<Dataset> {
 	let [promises, zipContent] = zipToContent(zip);
 	return Promise.all(promises).then(async () => {
 		let sections: Section[] = [];
@@ -37,7 +37,7 @@ export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> 
 	});
 }
 
-export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
+export function zipToRoomsDataset(zip: JSZip, id: string): Promise<Dataset> {
 	let index = zip.file("index.htm");
 	if (index == null) {
 		return Promise.reject(new InsightError("No file named index.htm"));
