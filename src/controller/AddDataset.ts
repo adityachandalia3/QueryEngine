@@ -3,6 +3,7 @@ import {IDataset, Room, RoomsDataset, Section, SectionsDataset} from "./Dataset"
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 import {parse, defaultTreeAdapter} from "parse5";
 import {table} from "console";
+import {networkInterfaces} from "os";
 
 export interface Content {
 	result: Result[];
@@ -64,16 +65,43 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
 				zipContent.push({file: relativePath, htmlContent: await promise});
 			}
 		});
-
 		return Promise.all(promises).then(() => {
 			let rooms: Room[] = [];
+			let tableContent: any[] = []
+			let num = 0;
 			for (const zc of zipContent) {
+
 				if (zc.htmlContent === "") {
 					continue;
 				}
+				let parsedZCContent = parse(zc.htmlContent);
 
-				// use parse5 here on zc.htmlContent
-				// get data for each room in html
+				let testShortName = String(zc.file)
+				let shortname = testShortName.substring(0,testShortName.length-3);
+
+				let tbodyNode: any[] = SearchNodeTag(parsedZCContent, "tbody")
+				//console.log(tbodyNode)
+				if (tbodyNode) {
+					tableContent = (getTableContent(tbodyNode));
+				} else {
+					continue;
+				}
+				tableContent = arrayManipulation(tableContent);
+
+				// let tempBuildingInfo = SearchNodeTag(parsedZCContent, "section");
+				// let buildingInfoScope = SearchNodeTag(tempBuildingInfo,"h2")
+				//
+				// let buildingInfo = getBuildingInfo(buildingInfoScope)
+				// console.log(buildingInfo)
+
+				console.log(tableContent);
+
+
+
+
+
+
+
 
 				// TODO parse zc.content into a result
 				let results: Result[] = [];
@@ -129,6 +157,73 @@ function getLinks(node: any): string[] {
 
 	return links;
 }
+
+function getTableContent(node:any): string[] {
+	let result: any[] = [];
+
+	for (const child of defaultTreeAdapter.getChildNodes(node)) {
+		if (child.nodeName === "tr") {
+			result = [child];
+		}
+	}
+	let curr = result.pop();
+
+	for (const c of defaultTreeAdapter.getChildNodes(curr)) {
+		if (c.nodeName === "td") {
+			for (const a of defaultTreeAdapter.getChildNodes(c)) {
+				if (a.nodeName === "a") {
+					let temp: any = defaultTreeAdapter.getFirstChild(a);
+					result.push(defaultTreeAdapter.getTextNodeContent(temp))
+				} else {
+					let temp2: any = a
+					result.push(defaultTreeAdapter.getTextNodeContent(temp2));
+				}
+			}
+		}
+	}
+	result.pop();
+	result.pop();
+	result.pop();
+	result.shift();
+	result.splice(1, 1);
+	return result;
+}
+
+function arrayManipulation(array: any[]): any[] {
+	let manipulatedArray: any[] = [];
+	for(const elem of array){
+		let newElem = elem.trim();
+		manipulatedArray.push(newElem);
+	}
+	return manipulatedArray;
+}
+
+function getBuildingInfo(node: any): any{
+	let curr: any = defaultTreeAdapter.getFirstChild(node)
+	let result: any = defaultTreeAdapter.getFirstChild(curr);
+	result = defaultTreeAdapter.getTextNodeContent(result)
+	return result;
+}
+
+
+// function SearchFullName(parsedContent: any, toFind: string){
+// 	if (defaultTreeAdapter.getTagName(parsedContent) === toFind) {
+// 		return node;
+// 	}
+//
+// 	if (defaultTreeAdapter.getChildNodes(node) === undefined || defaultTreeAdapter.getChildNodes(node).length === 0) {
+// 		return undefined;
+// 	}
+//
+// 	for (const child of defaultTreeAdapter.getChildNodes(node)) {
+// 		let ret = SearchNodeTag(child, toFind);
+// 		if (ret !== undefined) {
+// 			return ret;
+// 		}
+// 	}
+// }
+//
+// }
 
 function zipToContent(zip: JSZip): any[] {
 	if (zip.folder("courses") === null) {
