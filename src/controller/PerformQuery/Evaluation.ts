@@ -15,22 +15,32 @@ import {Query, Filter, Mkey, Skey, Sort} from "./Query";
  */
 export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	const maxResultLength: number = 5000;
-	let filteredData: any[];
+	let filteredData: any[]; // Section[] | Room[] (+ applykeys)
 	if (Object.values(query.WHERE).length === 0) {
 		filteredData = dataset.getData();
 	} else {
 		filteredData = evaluateFilter(dataset.getData(), query.WHERE);
 	}
+
+	// NOTE: applykey may be a field
+	// title vs sections_title
+	// must check apply key has underscore
+	// maybe can tag apply key with _ in beginning and remove later
+
+	// TODO transformation here
+	// add fields/applykeys to filteredData?
+
 	if (filteredData.length > maxResultLength) {
 		throw new ResultTooLargeError(filteredData.length + " found sections/rooms");
 	}
-	let results: InsightResult[] = sectionsToInsightResults(filteredData, dataset.id, query.OPTIONS.COLUMNS);
+	let results: InsightResult[] = dataToInsightResults(filteredData, dataset.id, query.OPTIONS.COLUMNS);
+	// TODO implement C2 sorting
 	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
 	return results;
 }
 
 function sortResultsBy(order: string | Sort | undefined, results: InsightResult[], id: string) {
-	if (order) {
+	if (typeof order === 'string') {
 		let field: string = id + "_" + order;
 		results.sort((a, b) => {
 			if (a[field] < b[field]) {
@@ -41,61 +51,72 @@ function sortResultsBy(order: string | Sort | undefined, results: InsightResult[
 			}
 			return 0;
 		});
+	} else if (order !== undefined) {
+		throw new Error("TODO: C2 ordering not implemented yet");
 	}
 }
 
-function evaluateFilter(sections: Section[], filter: Filter): Section[] {
-	let result: Section[] = [];
+function evaluateFilter(data: any[], filter: Filter): any[] {
+	let result: any[] = [];
 	if (filter.AND) {
-		result = sections;
+		result = data;
 		for (const f of filter.AND) {
-			let temp: Section[] = evaluateFilter(result, f as Filter);
+			let temp: any[] = evaluateFilter(result, f as Filter);
 			result = result.filter(Set.prototype.has, new Set(temp));
 		}
 	} else if (filter.OR) {
 		result = [];
 		for (const f of filter.OR) {
-			let temp: Section[] = evaluateFilter(sections, f as Filter);
+			let temp: any[] = evaluateFilter(data, f as Filter);
 			result = [...new Set([...temp, ...result])];
 		}
 	} else if (filter.LT) {
 		let key: string = getField(filter.LT);
-		result = sections.filter((section) => section[key as keyof Section] < filter.LT[key as keyof Mkey]);
+		result = data.filter((section) => section[key] < filter.LT[key as keyof Mkey]);
 	} else if (filter.GT) {
 		let key: string = getField(filter.GT);
-		result = sections.filter((section) => section[key as keyof Section] > filter.GT[key as keyof Mkey]);
+		result = data.filter((section) => section[key] > filter.GT[key as keyof Mkey]);
 	} else if (filter.EQ) {
 		let key: string = getField(filter.EQ);
-		result = sections.filter((section) => section[key as keyof Section] === filter.EQ[key as keyof Mkey]);
+		result = data.filter((section) => section[key] === filter.EQ[key as keyof Mkey]);
 	} else if (filter.IS) {
 		let key: string = getField(filter.IS);
-		result = sections.filter((section) => {
-			return isMatch(section[key as keyof Section] as unknown as string, filter.IS[key as keyof Skey]);
+		result = data.filter((section) => {
+			return isMatch(section[key] as string, filter.IS[key as keyof Skey]);
 		});
 	} else if (filter.NOT) {
-		let temp: Set<Section> = new Set(...[evaluateFilter(sections, filter.NOT as Filter)]);
-		result = sections.filter((section) => !temp.has(section));
+		let temp: Set<any> = new Set(...[evaluateFilter(data, filter.NOT as Filter)]);
+		result = data.filter((d) => !temp.has(d));
 	}
 	return result;
 }
 
 /**
  *
- * Converts sections to insight results with specified columns and id attached to fields
+ * Converts data to insight results with specified columns and id attached to fields
  *
- * @param sections
+ * @param data
  * @param dataset
  * @returns translated InsightResults
  *
  */
-function sectionsToInsightResults(sections: Section[], id: string, options: string[]): InsightResult[] {
+function dataToInsightResults(data: any[], id: string, columns: string[]): InsightResult[] {
 	let results: InsightResult[] = [];
-	for (const section of sections) {
-		let res: InsightResult = {};
-		for (const opt of options) {
-			res[id + "_" + opt] = section[opt as keyof Section];
+	for (const d of data) {
+		let result: InsightResult = {};
+		for (const col of columns) {
+			result[id + "_" + col] = d[col];
+
+			// TODO
+
+			// if (col is a regular field) {
+			// 	result[id + "_" + col] = d[col];
+			// } else {
+			// 	// col/applykey must be a field in res/filteredData
+			// 	result[col] = d[col];
+			// }
 		}
-		results.push(res);
+		results.push(result);
 	}
 	return results;
 }

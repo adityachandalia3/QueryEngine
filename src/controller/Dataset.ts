@@ -31,7 +31,7 @@ export class Dataset implements InsightDataset {
 	public readonly id: string;
 	public readonly kind: InsightDatasetKind;
 	public readonly numRows: number;
-	public readonly data: any[];
+	private readonly data: any[];
 
 	constructor(id: string, kind: InsightDatasetKind, numRows: number, data: any[]) {
 		this.id = id;
@@ -63,7 +63,7 @@ export class SectionsDataset extends Dataset {
 	}
 
 	public getData(): Section[] {
-		return this.data;
+		return super.getData();
 	}
 }
 
@@ -74,6 +74,6 @@ export class RoomsDataset extends Dataset {
 	}
 
 	public getData(): Room[] {
-		return this.data;
+		return super.getData();
 	}
 }

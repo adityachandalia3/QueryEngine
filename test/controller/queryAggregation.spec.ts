@@ -54,7 +54,7 @@ describe("QueryRoomsAndAggregation", function () {
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
 				facade.addDataset("sections", content, InsightDatasetKind.Sections),
-				// facade.addDataset("rooms", roomContent, InsightDatasetKind.Sections),
+				facade.addDataset("rooms", roomContent, InsightDatasetKind.Rooms),
 			];
 
 			return Promise.all(loadDatasetPromises);
