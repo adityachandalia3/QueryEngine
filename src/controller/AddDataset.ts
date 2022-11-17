@@ -40,64 +40,66 @@ export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> 
 	});
 }
 
-// export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
-// // 	let index = zip.file("index.htm");
-// // 	if (index == null) {
-// // 		return Promise.reject(new InsightError("No file named index.htm"));
-// // 	}
-// // 	return index.async("string").then((idx) => {
-// // 		let document = parse(idx);
-// // 		let tbodyNode = SearchNodeTag(document, "tbody");
-// // 		return getLinks(tbodyNode);
-// // 	}).then((links) => {
-// // 		let buildings = zip.folder("campus/discover/buildings-and-classrooms");
-// // 		if (buildings === null) {
-// // 			return Promise.reject(new InsightError("No directory named campus/discover/buildings-and-classrooms"));
-// // 		}
-// // 		const zipContent: any[] = [];
-// // 		const promises: any[] = [];
-// // 		buildings.forEach(async (relativePath, file) => {
-// // 			if (links.includes(file.name)) {
-// // 				const promise = file.async("string");
-// // 				promises.push(promise);
-// // 				zipContent.push({file: relativePath, htmlContent: await promise});
-// // 			}
-// // 		});
-// // 		return Promise.all(promises).then(() => {
-// // 			let roomsResult: Room[] = [];
-// // 			let rooms: Room[] = [];
-// // 			let tableContent: any[] = [];
-// // 			let shortname, href, buildingInfo, address: any;
-// // 			for (const zc of zipContent) {
-// // 				if (zc.htmlContent === "") {
-// // 					continue;
-// // 				}
-// // 				let parsedZCContent = parse(zc.htmlContent);
-// // 				let tbodyNode: any[] = SearchNodeTag(parsedZCContent, "tbody");
-// // 				if (tbodyNode) {
-// // 					tableContent = arrayManipulation((getTableContent(tbodyNode)));
-// // 					let buildingInfoScope = SearchNodeTag(SearchNodeTag(parsedZCContent, "section"),"h2");
-// // 					if(buildingInfoScope){
-// // 						buildingInfo = getBuildingInfo(buildingInfoScope);
-// // 						address = getAddressInfo(defaultTreeAdapter.getParentNode(buildingInfoScope));
-// // 						shortname = String(zc.file).substring(0,String(zc.file).length - 4);
-// // 						let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
-// // 						href = "http://students.ubc.ca/" + links[index1];
-// // 					} else {
-// // 						continue;
-// // 					};
-// // 					rooms = resultsToRooms(tableContent,shortname,href,buildingInfo,address);
-// // 					for(const content of rooms){
-// // 						roomsResult.push(content);
-// // 					}
-// // 				} else {
-// // 					continue;
-// // 				}
-// // 			}
-// // 			return new RoomsDataset(id, roomsResult.length, roomsResult);
-// // 		});
-// // 	});
-// // }
+export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
+	let index = zip.file("index.htm");
+	if (index === null) {
+		return Promise.reject(new InsightError("No file named index.htm"));
+	}
+	return index.async("string").then((idx) => {
+		let document = parse(idx);
+		let tbodyNode = SearchNodeTag(document, "tbody");
+		return getLinks(tbodyNode);
+	}).then((links) => {
+		let buildings = zip.folder("campus/discover/buildings-and-classrooms");
+		if (buildings === null) {
+			return Promise.reject(new InsightError("No directory named campus/discover/buildings-and-classrooms"));
+		}
+		const zipContent: any[] = [];
+		const promises: any[] = [];
+		buildings.forEach(async (relativePath, file) => {
+			if (links.includes(file.name)) {
+				const promise = file.async("string");
+				promises.push(promise);
+				zipContent.push({file: relativePath, htmlContent: await promise});
+			}
+		});
+		return Promise.all(promises).then(() => parseRoomData(id, zipContent, links));
+	});
+}
+
+function parseRoomData(id: string, zipContent: any[], links: string[]): IDataset {
+	let roomsResult: Room[] = [];
+	let rooms: Room[] = [];
+	let tableContent: any[] = [];
+	let shortname, href, buildingInfo, address: any;
+	for (const zc of zipContent) {
+		if (zc.htmlContent === "") {
+			continue;
+		}
+		let parsedZCContent = parse(zc.htmlContent);
+		let tbodyNode: any[] = SearchNodeTag(parsedZCContent, "tbody");
+		if (tbodyNode) {
+			tableContent = arrayManipulation((getTableContent(tbodyNode)));
+			let buildingInfoScope = SearchNodeTag(SearchNodeTag(parsedZCContent, "section"),"h2");
+			if(buildingInfoScope){
+				buildingInfo = getBuildingInfo(buildingInfoScope);
+				address = getAddressInfo(defaultTreeAdapter.getParentNode(buildingInfoScope));
+				shortname = String(zc.file).substring(0,String(zc.file).length - 4);
+				let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
+				href = "http://students.ubc.ca/" + links[index1];
+			} else {
+				continue;
+			};
+			rooms = resultsToRooms(tableContent,shortname,href,buildingInfo,address);
+			for(const content of rooms){
+				roomsResult.push(content);
+			}
+		} else {
+			continue;
+		}
+	}
+	return new RoomsDataset(id, roomsResult.length, roomsResult);
+}
 
 function SearchNodeTag(node: any, toFind: string): any {
 	if (defaultTreeAdapter.getTagName(node) === toFind) {
