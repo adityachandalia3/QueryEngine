@@ -40,79 +40,64 @@ export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> 
 	});
 }
 
-export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
-	let index = zip.file("index.htm");
-	if (index == null) {
-		return Promise.reject(new InsightError("No file named index.htm"));
-	}
-	return index.async("string").then((idx) => {
-		let document = parse(idx);
-		let tbodyNode = SearchNodeTag(document, "tbody");
-		let links: string[] = getLinks(tbodyNode);
-		return links;
-	}).then((links) => {
-		let buildings = zip.folder("campus/discover/buildings-and-classrooms");
-		if (buildings === null) {
-			return Promise.reject(new InsightError("No directory named campus/discover/buildings-and-classrooms"));
-		}
-
-		const zipContent: any[] = [];
-		const promises: any[] = [];
-		buildings.forEach(async (relativePath, file) => {
-			if (links.includes(file.name)) {
-				const promise = file.async("string");
-				promises.push(promise);
-				zipContent.push({file: relativePath, htmlContent: await promise});
-			}
-		});
-		return Promise.all(promises).then(() => {
-			let rooms: Room[] = [];
-			let tableContent: any[] = []
-			let num = 0;
-			for (const zc of zipContent) {
-
-				if (zc.htmlContent === "") {
-					continue;
-				}
-				let parsedZCContent = parse(zc.htmlContent);
-
-				let testShortName = String(zc.file)
-				let shortname = testShortName.substring(0,testShortName.length-3);
-
-				let tbodyNode: any[] = SearchNodeTag(parsedZCContent, "tbody")
-				//console.log(tbodyNode)
-				if (tbodyNode) {
-					tableContent = (getTableContent(tbodyNode));
-				} else {
-					continue;
-				}
-				tableContent = arrayManipulation(tableContent);
-
-				// let tempBuildingInfo = SearchNodeTag(parsedZCContent, "section");
-				// let buildingInfoScope = SearchNodeTag(tempBuildingInfo,"h2")
-				//
-				// let buildingInfo = getBuildingInfo(buildingInfoScope)
-				// console.log(buildingInfo)
-
-				console.log(tableContent);
-
-
-
-
-
-
-
-
-				// TODO parse zc.content into a result
-				let results: Result[] = [];
-				if (results.length > 0) {
-					rooms = rooms.concat(resultsToRooms(results));
-				}
-			}
-			return new RoomsDataset(id, rooms.length, rooms);
-		});
-	});
-}
+// export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
+// // 	let index = zip.file("index.htm");
+// // 	if (index == null) {
+// // 		return Promise.reject(new InsightError("No file named index.htm"));
+// // 	}
+// // 	return index.async("string").then((idx) => {
+// // 		let document = parse(idx);
+// // 		let tbodyNode = SearchNodeTag(document, "tbody");
+// // 		return getLinks(tbodyNode);
+// // 	}).then((links) => {
+// // 		let buildings = zip.folder("campus/discover/buildings-and-classrooms");
+// // 		if (buildings === null) {
+// // 			return Promise.reject(new InsightError("No directory named campus/discover/buildings-and-classrooms"));
+// // 		}
+// // 		const zipContent: any[] = [];
+// // 		const promises: any[] = [];
+// // 		buildings.forEach(async (relativePath, file) => {
+// // 			if (links.includes(file.name)) {
+// // 				const promise = file.async("string");
+// // 				promises.push(promise);
+// // 				zipContent.push({file: relativePath, htmlContent: await promise});
+// // 			}
+// // 		});
+// // 		return Promise.all(promises).then(() => {
+// // 			let roomsResult: Room[] = [];
+// // 			let rooms: Room[] = [];
+// // 			let tableContent: any[] = [];
+// // 			let shortname, href, buildingInfo, address: any;
+// // 			for (const zc of zipContent) {
+// // 				if (zc.htmlContent === "") {
+// // 					continue;
+// // 				}
+// // 				let parsedZCContent = parse(zc.htmlContent);
+// // 				let tbodyNode: any[] = SearchNodeTag(parsedZCContent, "tbody");
+// // 				if (tbodyNode) {
+// // 					tableContent = arrayManipulation((getTableContent(tbodyNode)));
+// // 					let buildingInfoScope = SearchNodeTag(SearchNodeTag(parsedZCContent, "section"),"h2");
+// // 					if(buildingInfoScope){
+// // 						buildingInfo = getBuildingInfo(buildingInfoScope);
+// // 						address = getAddressInfo(defaultTreeAdapter.getParentNode(buildingInfoScope));
+// // 						shortname = String(zc.file).substring(0,String(zc.file).length - 4);
+// // 						let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
+// // 						href = "http://students.ubc.ca/" + links[index1];
+// // 					} else {
+// // 						continue;
+// // 					};
+// // 					rooms = resultsToRooms(tableContent,shortname,href,buildingInfo,address);
+// // 					for(const content of rooms){
+// // 						roomsResult.push(content);
+// // 					}
+// // 				} else {
+// // 					continue;
+// // 				}
+// // 			}
+// // 			return new RoomsDataset(id, roomsResult.length, roomsResult);
+// // 		});
+// // 	});
+// // }
 
 function SearchNodeTag(node: any, toFind: string): any {
 	if (defaultTreeAdapter.getTagName(node) === toFind) {
@@ -147,83 +132,88 @@ function getLinks(node: any): string[] {
 				if (attr.name === "href" &&
 				 attr.value.startsWith("./campus/discover/buildings-and-classrooms/") &&
 				 attr.value.endsWith(".htm")) {
-					if (!links.includes(attr.value)) {
+					if (!links.includes(attr.value.slice(2))) {
 						links.push(attr.value.slice(2));
 					}
 				}
 			}
 		}
 	}
-
 	return links;
 }
 
-function getTableContent(node:any): string[] {
+function getTableContent(node: any): string[] {
 	let result: any[] = [];
+	let trNodes: any[] = [];
+	let finalResult: any[] = [];
+	let num: number = 0;
 
 	for (const child of defaultTreeAdapter.getChildNodes(node)) {
 		if (child.nodeName === "tr") {
-			result = [child];
+			trNodes.push(child);
 		}
 	}
-	let curr = result.pop();
-
-	for (const c of defaultTreeAdapter.getChildNodes(curr)) {
-		if (c.nodeName === "td") {
-			for (const a of defaultTreeAdapter.getChildNodes(c)) {
-				if (a.nodeName === "a") {
-					let temp: any = defaultTreeAdapter.getFirstChild(a);
-					result.push(defaultTreeAdapter.getTextNodeContent(temp))
-				} else {
-					let temp2: any = a
-					result.push(defaultTreeAdapter.getTextNodeContent(temp2));
+	for(const trNode of trNodes){
+		let curr = trNode;
+		for (const c of defaultTreeAdapter.getChildNodes(curr)) {
+			if (c.nodeName === "td") {
+				for (const a of defaultTreeAdapter.getChildNodes(c)) {
+					if (a.nodeName === "a") {
+						let temp: any = defaultTreeAdapter.getFirstChild(a);
+						result.push(defaultTreeAdapter.getTextNodeContent(temp));
+					} else {
+						let temp2: any = a;
+						result.push(defaultTreeAdapter.getTextNodeContent(temp2));
+					}
 				}
 			}
 		}
+		result.pop();
+		result.pop();
+		result.pop();
+		result.shift();
+		result.splice(1, 1);
+		finalResult.push(result);
+		result = [];
 	}
-	result.pop();
-	result.pop();
-	result.pop();
-	result.shift();
-	result.splice(1, 1);
-	return result;
+	return finalResult;
 }
 
 function arrayManipulation(array: any[]): any[] {
+	let tempArray: any[] = [];
 	let manipulatedArray: any[] = [];
 	for(const elem of array){
-		let newElem = elem.trim();
-		manipulatedArray.push(newElem);
+		for(const elem1 of elem){
+			let newElem = elem1.trim();
+			tempArray.push(newElem);
+		}
+		manipulatedArray.push(tempArray);
+		tempArray = [];
 	}
 	return manipulatedArray;
 }
 
 function getBuildingInfo(node: any): any{
-	let curr: any = defaultTreeAdapter.getFirstChild(node)
+	let curr: any;
+	curr = defaultTreeAdapter.getFirstChild(node);
 	let result: any = defaultTreeAdapter.getFirstChild(curr);
-	result = defaultTreeAdapter.getTextNodeContent(result)
+	result = defaultTreeAdapter.getTextNodeContent(result);
 	return result;
+
 }
+function getAddressInfo(node: any): any {
+	let result2: any;
+	for(const child of defaultTreeAdapter.getChildNodes(node)) {
+		let temp: any = child;
+		if (defaultTreeAdapter.getTagName(temp) === "div") {
+			let tempChild: any = defaultTreeAdapter.getFirstChild(temp);
+			let tempChildChild: any = defaultTreeAdapter.getFirstChild(tempChild);
+			result2 = defaultTreeAdapter.getTextNodeContent(tempChildChild);
+			return result2;
+		}
+	}
 
-
-// function SearchFullName(parsedContent: any, toFind: string){
-// 	if (defaultTreeAdapter.getTagName(parsedContent) === toFind) {
-// 		return node;
-// 	}
-//
-// 	if (defaultTreeAdapter.getChildNodes(node) === undefined || defaultTreeAdapter.getChildNodes(node).length === 0) {
-// 		return undefined;
-// 	}
-//
-// 	for (const child of defaultTreeAdapter.getChildNodes(node)) {
-// 		let ret = SearchNodeTag(child, toFind);
-// 		if (ret !== undefined) {
-// 			return ret;
-// 		}
-// 	}
-// }
-//
-// }
+}
 
 function zipToContent(zip: JSZip): any[] {
 	if (zip.folder("courses") === null) {
@@ -241,9 +231,21 @@ function zipToContent(zip: JSZip): any[] {
 	return [promises, zipContent];
 }
 
-function resultsToRooms(results: Result[]): Room[] {
-	// TODO
-	return [];
+function resultsToRooms(tableContent: any[], shortname: any, href: any, buildingInfo: any, address: any,): any[] {
+	let roomName, number, capacity, furniture, roomType: any;
+	let rooms: any = [];
+	for (const content of tableContent) {
+		number = content[0];
+		capacity = content[1];
+		furniture = content [2];
+		roomType = content [3];
+		roomName = shortname + number;
+		rooms.push({
+			fullname:buildingInfo, shortname: shortname, number:number, name:roomName, address:address,
+			type:roomType, furniture:furniture, href:href, lat:0, lon:0, seats:capacity
+		});
+	}
+	return rooms;
 }
 
 function resultsToSections(results: Result[]): Section[] {
@@ -281,3 +283,5 @@ function resultsToSections(results: Result[]): Section[] {
 	}
 	return sections;
 }
+
+
