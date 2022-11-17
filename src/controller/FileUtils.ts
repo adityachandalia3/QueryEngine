@@ -1,5 +1,5 @@
-import {IDataset, SectionsDataset} from "./Dataset";
-import {InsightError} from "./IInsightFacade";
+import {Dataset, SectionsDataset} from "./Dataset";
+import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 import * as fs from "fs-extra";
 
 const persistDir = "./data/";
@@ -16,7 +16,7 @@ const persistDir = "./data/";
  * The promise should fulfill with the id of the saved dataset.
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
-export function saveDataset(dataset: IDataset): Promise<string> {
+export function saveDataset(dataset: Dataset): Promise<string> {
 	try {
 		return fs.outputJson(persistDir + dataset.id + ".JSON", dataset).then(async () => {
 			return Promise.resolve(dataset.id);
@@ -37,9 +37,11 @@ export function saveDataset(dataset: IDataset): Promise<string> {
  * The promise should fulfill with the id of the loaded dataset.
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
-export function loadDataset(id: string): Promise<IDataset> {
+export function loadDataset(id: string): Promise<Dataset> {
 	return fs.readJson(persistDir + id + ".JSON").then(
-		(ret) => ret,
+		(ret) => {
+			return new Dataset(ret.id, ret.kind, ret.numRows, ret.data);
+		},
 		(err) => {
 			return Promise.reject(new InsightError("Could not read file with given id"));
 		});

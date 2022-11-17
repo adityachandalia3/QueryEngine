@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import {IDataset, Room, RoomsDataset, Section, SectionsDataset} from "../Dataset";
+import {Dataset, Room, RoomsDataset, Section, SectionsDataset} from "../Dataset";
 import {InsightDatasetKind, InsightError} from "../IInsightFacade";
 import {parse} from "parse5";
 import {searchNodeTag, getLinks, arrayManipulation, getTableContent,
@@ -23,7 +23,7 @@ export interface Result {
 	Section: string;
 }
 
-export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> {
+export function zipToSectionsDataset(zip: JSZip, id: string): Promise<Dataset> {
 	let [promises, zipContent] = zipToContent(zip);
 	return Promise.all(promises).then(async () => {
 		let sections: Section[] = [];
@@ -40,7 +40,7 @@ export function zipToSectionsDataset(zip: JSZip, id: string): Promise<IDataset> 
 	});
 }
 
-export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
+export function zipToRoomsDataset(zip: JSZip, id: string): Promise<Dataset> {
 	let index = zip.file("index.htm");
 	if (index === null) {
 		return Promise.reject(new InsightError("No file named index.htm"));
@@ -67,7 +67,7 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<IDataset> {
 	});
 }
 
-function parseRoomData(id: string, zipContent: any[], links: string[]): IDataset {
+function parseRoomData(id: string, zipContent: any[], links: string[]): Dataset {
 	let roomsResult: Room[] = [];
 	let rooms: Room[] = [];
 	let tableContent: any[] = [];
@@ -79,7 +79,7 @@ function parseRoomData(id: string, zipContent: any[], links: string[]): IDataset
 		let parsedZCContent = parse(zc.htmlContent);
 		let tbodyNode: any[] = searchNodeTag(parsedZCContent, "tbody");
 		if (tbodyNode) {
-			tableContent = arrayManipulation((getTableContent(tbodyNode)));
+			tableContent = arrayManipulation(getTableContent(tbodyNode));
 			let buildingInfoScope = searchNodeAttr(parsedZCContent, "id", "building-info");
 			if (buildingInfoScope) {
 				fullname = getFullname(buildingInfoScope);
@@ -119,7 +119,7 @@ function resultsToRooms(tableContent: any[], shortname: any, href: any, fullname
 	let rooms: Room[] = [];
 	for (const content of tableContent) {
 		number = content[0];
-		capacity = content[1];
+		capacity = parseInt(content[1], 10);
 		furniture = content[2];
 		roomType = content[3];
 		roomName = shortname + number;
