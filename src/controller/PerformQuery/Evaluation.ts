@@ -23,6 +23,7 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	}
 	// TODO transformation here
 	// add fields/applykeys to filteredData?
+	// applyTransformation(dataset, query);
 
 	if (filteredData.length > maxResultLength) {
 		throw new ResultTooLargeError(filteredData.length + " found sections/rooms");
@@ -129,3 +130,7 @@ function getField(key: Mkey | Skey): string {
 	}
 	throw new Error("Invalid state.");
 }
+function applyTransformation(dataset: Dataset, query: Query) {
+	throw new Error("Function not implemented.");
+}
+
