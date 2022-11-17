@@ -21,12 +21,6 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	} else {
 		filteredData = evaluateFilter(dataset.getData(), query.WHERE);
 	}
-
-	// NOTE: applykey may be a field
-	// title vs sections_title
-	// must check apply key has underscore
-	// maybe can tag apply key with _ in beginning and remove later
-
 	// TODO transformation here
 	// add fields/applykeys to filteredData?
 

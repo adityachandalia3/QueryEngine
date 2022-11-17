@@ -127,7 +127,6 @@ function validateOptions(query: Query) {
 			}
 		}
 	} else {
-		// TODO double check this
 		for (const i in query.OPTIONS.COLUMNS) {
 			if (!transformationKeys.includes(query.OPTIONS.COLUMNS[i])) {
 				throw new InsightError("Keys in COLUMNS must be in GROUP or APPLY");
@@ -156,38 +155,32 @@ function validateTransformations(query: Query) {
 	if (query.TRANSFORMATIONS === undefined) {
 		return;
 	}
-	// transformation must have group and apply
 	if (query.TRANSFORMATIONS.APPLY === undefined || query.TRANSFORMATIONS.GROUP === undefined) {
 		throw new InsightError("TRANSFORMATIONS must have GROUP and APPLY");
 	}
-
-	// group must have at least one key
 	if (!Array.isArray(query.TRANSFORMATIONS.GROUP) ||
 		query.TRANSFORMATIONS.GROUP.length === 0) {
 		throw new InsightError("GROUP must be a non-empty array");
 	}
-
-	// key is mkey or skey
 	for (const k of query.TRANSFORMATIONS.GROUP) {
-		if (!isKey(k)) { // TODO
+		if (!isKey(k)) {
 			throw new InsightError("Key is not a valid key");
 		}
 		transformationKeys.push(k);
 	}
-	// apply may have 0 or more rules
 	if (!Array.isArray(query.TRANSFORMATIONS.APPLY)) {
 		throw new InsightError("APPLY must be an array");
 	}
 
-
-	// TODO CHECK UNDERSCORE IN APPLY KEY
 	for (const rule of query.TRANSFORMATIONS.APPLY) {
 		if (Object.keys(rule).length !== 1) {
 			throw new InsightError("APPLY rule should only have 1 key");
 		}
-
 		let anykey = Object.keys(rule)[0];
 		let body = Object.values(rule)[0];
+		if (anykey.includes("_")) {
+			throw new InsightError("APPLY key may not contain underscore");
+		}
 		if (transformationKeys.includes(anykey)) {
 			throw new InsightError("Duplicate APPLY key");
 		}
@@ -195,13 +188,12 @@ function validateTransformations(query: Query) {
 		if (Object.keys(body).length !== 1) {
 			throw new InsightError("APPLY body should only have 1 key");
 		}
-
 		let token = Object.keys(body)[0];
 		let key = Object.values(body)[0];
 		if (!isToken(token)) {
 			throw new InsightError("Invalid transformation operator");
 		}
-		if (!isKey(key)) { // TODO
+		if (!isKey(key)) {
 			throw new InsightError("Invalid key " + key + " in " + token);
 		}
 	}
