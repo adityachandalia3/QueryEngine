@@ -189,12 +189,35 @@ function validateTransformations(query: Query) {
 			throw new InsightError("APPLY body should only have 1 key");
 		}
 		let token = Object.keys(body)[0];
-		let key = Object.values(body)[0];
-		if (!isToken(token)) {
+		let key: string = Object.values(body)[0];
+		if (isToken(token)) {
+			checkValidTokenOnKey(token, key);
+		} else {
 			throw new InsightError("Invalid transformation operator");
 		}
 		if (!isKey(key)) {
 			throw new InsightError("Invalid key " + key + " in " + token);
+		}
+	}
+}
+
+function checkValidTokenOnKey(token: string, key: string) {
+	if (token !== "COUNT") {
+		let field = key.substring(key.indexOf("_") + 1);
+		if ("dept" === field ||
+			"id" === field ||
+			"instructor" === field ||
+			"title" === field ||
+			"uuid" === field ||
+			"fullname" === field ||
+			"shortname" === field ||
+			"number" === field ||
+			"name" === field ||
+			"address" === field ||
+			"type" === field ||
+			"furniture" === field ||
+			"href" === field) {
+			throw new InsightError("APPLY token can not be applied to string type");
 		}
 	}
 }

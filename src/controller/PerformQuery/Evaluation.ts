@@ -21,9 +21,10 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	} else {
 		filteredData = evaluateFilter(dataset.getData(), query.WHERE);
 	}
-	// TODO transformation here
-	// add fields/applykeys to filteredData?
-	// applyTransformation(dataset, query);
+
+	if (query.TRANSFORMATIONS !== undefined) {
+		filteredData = applyTransformation(filteredData, query);
+	}
 
 	if (filteredData.length > maxResultLength) {
 		throw new ResultTooLargeError(filteredData.length + " found sections/rooms");
@@ -130,7 +131,12 @@ function getField(key: Mkey | Skey): string {
 	}
 	throw new Error("Invalid state.");
 }
-function applyTransformation(dataset: Dataset, query: Query) {
-	throw new Error("Function not implemented.");
+function applyTransformation(results: any[], query: Query): any[] {
+	// add fields/applykeys to filteredData?
+
+	// 1. Group
+	// let groups: any[][] = groupResults(results, query.TRANSFORMATIONS.GROUP)
+	// 2. Apply
+	return results;
 }
 
