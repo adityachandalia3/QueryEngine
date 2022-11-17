@@ -33,7 +33,7 @@ export function zipToSectionsDataset(zip: JSZip, id: string): Promise<Dataset> {
 			}
 			let results: Result[] = (JSON.parse(zc.content) as Content).result;
 			if (results.length > 0) {
-				sections = sections.concat(resultsToSections(results));
+				sections = sections.concat(resultsToSections(id, results));
 			}
 		}
 		return new SectionsDataset(id, sections.length, sections);
@@ -90,7 +90,7 @@ function parseRoomData(id: string, zipContent: any[], links: string[]): Dataset 
 			} else {
 				continue;
 			};
-			roomsResult.push(...resultsToRooms(tableContent, shortname, href, fullname, address));
+			roomsResult.push(...resultsToRooms(id, tableContent, shortname, href, fullname, address));
 		} else {
 			continue;
 		}
@@ -114,7 +114,10 @@ function zipToContent(zip: JSZip): any[] {
 	return [promises, zipContent];
 }
 
-function resultsToRooms(tableContent: any[], shortname: any, href: any, fullname: any, address: any,): Room[] {
+function resultsToRooms(
+	id: string, tableContent: any[], shortname: any,
+	href: any, fullname: any, address: any
+): Room[] {
 	let roomName, number, capacity, furniture, roomType: any;
 	let rooms: Room[] = [];
 	for (const content of tableContent) {
@@ -124,14 +127,23 @@ function resultsToRooms(tableContent: any[], shortname: any, href: any, fullname
 		roomType = content[3];
 		roomName = shortname + number;
 		rooms.push({
-			fullname: fullname, shortname: shortname, number: number, name: roomName, address: address,
-			type: roomType, furniture: furniture, href: href, lat: 0, lon: 0, seats: capacity
+			[id + "_fullname"]: fullname,
+			[id + "_shortname"]: shortname,
+			[id + "_number"]: number,
+			[id + "_name"]: roomName,
+			[id + "_address"]: address,
+			[id + "_type"]: roomType,
+			[id + "_furniture"]: furniture,
+			[id + "_href"]: href,
+			[id + "_lat"]: 0,
+			[id + "_lon"]: 0,
+			[id + "_seats"]: capacity
 		});
 	}
 	return rooms;
 }
 
-function resultsToSections(results: Result[]): Section[] {
+function resultsToSections(id: string, results: Result[]): Section[] {
 	let sections: Section[] = [];
 	for (const result of results) {
 		if (result.Section === "overall") {
@@ -152,16 +164,16 @@ function resultsToSections(results: Result[]): Section[] {
 			continue;
 		}
 		sections.push({
-			dept: result.Subject,
-			id: result.Course,
-			instructor: result.Professor,
-			title: result.Title,
-			uuid: result.id,
-			avg: result.Avg,
-			pass: result.Pass,
-			fail: result.Fail,
-			audit: result.Audit,
-			year: result.Year,
+			[id + "_dept"]: result.Subject,
+			[id + "_id"]: result.Course,
+			[id + "_instructor"]: result.Professor,
+			[id + "_title"]: result.Title,
+			[id + "_uuid"]: result.id,
+			[id + "_avg"]: result.Avg,
+			[id + "_pass"]: result.Pass,
+			[id + "_fail"]: result.Fail,
+			[id + "_audit"]: result.Audit,
+			[id + "_year"]: result.Year,
 		});
 	}
 	return sections;

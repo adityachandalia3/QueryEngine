@@ -1,30 +1,32 @@
 import {InsightDatasetKind, InsightDataset} from "./IInsightFacade";
 
 export interface Section {
-	dept: string;
-	id: string;
-	instructor: string;
-	title: string;
-	uuid: number;
-	avg: number;
-	pass: number;
-	fail: number;
-	audit: number;
-	year: number;
+	// dept: string;
+	// id: string;
+	// instructor: string;
+	// title: string;
+	// uuid: number;
+	// avg: number;
+	// pass: number;
+	// fail: number;
+	// audit: number;
+	// year: number;
+	[key: string]: string | number;
 }
 
 export interface Room {
-	fullname: string;
-	shortname: string;
-	number: string;
-	name: string;
-	address: string;
-	type: string;
-	furniture: string;
-	href: string;
-	lat: number;
-	lon: number;
-	seats: number;
+	// fullname: string;
+	// shortname: string;
+	// number: string;
+	// name: string;
+	// address: string;
+	// type: string;
+	// furniture: string;
+	// href: string;
+	// lat: number;
+	// lon: number;
+	// seats: number;
+	[key: string]: string | number;
 }
 
 export class Dataset implements InsightDataset {

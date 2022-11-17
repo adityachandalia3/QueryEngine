@@ -91,16 +91,13 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		let id: string;
-		let queryString: string;
 
 		try {
-			[id, queryString] = checkAndStripId(JSON.stringify(query));
+			id = checkAndStripId(JSON.stringify(query));
 		} catch (err) {
 			console.log((err as Error).message);
 			return Promise.reject(err);
 		}
-
-		query = JSON.parse(queryString);
 
 		if (isQuery(query)) {
 			if (this.currentDataset !== null && this.currentDataset.id === id) {

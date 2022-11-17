@@ -5,7 +5,7 @@ import {SectionsDataset, Section} from "../Dataset";
 
 let isSections: boolean;
 let transformationKeys: string[];
-
+let ID: string;
 /**
  * Returns id and query with id stripped.
  *
@@ -15,7 +15,7 @@ let transformationKeys: string[];
  * Will throw InsightError if id is invalid.
  *
  */
-export function checkAndStripId(query: string): [string, string] {
+export function checkAndStripId(query: string): string {
 	let id = "";
 	const regex = /(?<=")[^"]*_/g; // will break if an underscore is outside of quotes
 	let matches = Array.from(query.matchAll(regex));
@@ -34,9 +34,8 @@ export function checkAndStripId(query: string): [string, string] {
 	if (!isValidId(id)) {
 		throw new InsightError("id is not valid");
 	}
-
-	query = query.replaceAll(regex, "");
-	return [id, query];
+	ID = id;
+	return id;
 }
 
 /**
@@ -128,6 +127,7 @@ function validateOptions(query: Query) {
 			}
 		}
 	} else {
+		// TODO double check this
 		for (const i in query.OPTIONS.COLUMNS) {
 			if (!transformationKeys.includes(query.OPTIONS.COLUMNS[i])) {
 				throw new InsightError("Keys in COLUMNS must be in GROUP or APPLY");
@@ -169,7 +169,7 @@ function validateTransformations(query: Query) {
 
 	// key is mkey or skey
 	for (const k of query.TRANSFORMATIONS.GROUP) {
-		if (!isKey(k)) {
+		if (!isKey(k)) { // TODO
 			throw new InsightError("Key is not a valid key");
 		}
 		transformationKeys.push(k);
@@ -179,6 +179,8 @@ function validateTransformations(query: Query) {
 		throw new InsightError("APPLY must be an array");
 	}
 
+
+	// TODO CHECK UNDERSCORE IN APPLY KEY
 	for (const rule of query.TRANSFORMATIONS.APPLY) {
 		if (Object.keys(rule).length !== 1) {
 			throw new InsightError("APPLY rule should only have 1 key");
@@ -199,7 +201,7 @@ function validateTransformations(query: Query) {
 		if (!isToken(token)) {
 			throw new InsightError("Invalid transformation operator");
 		}
-		if (!isKey(key)) {
+		if (!isKey(key)) { // TODO
 			throw new InsightError("Invalid key " + key + " in " + token);
 		}
 	}
@@ -228,30 +230,30 @@ function isToken(token: string): boolean {
 export function isKey(field: string): boolean {
 	if (isSections) {
 		return (
-			field === "avg" ||
-			field === "pass" ||
-			field === "fail" ||
-			field === "audit" ||
-			field === "year" ||
-			field === "dept" ||
-			field === "id" ||
-			field === "instructor" ||
-			field === "title" ||
-			field === "uuid"
+			field === ID + "_avg" ||
+			field === ID + "_pass" ||
+			field === ID + "_fail" ||
+			field === ID + "_audit" ||
+			field === ID + "_year" ||
+			field === ID + "_dept" ||
+			field === ID + "_id" ||
+			field === ID + "_instructor" ||
+			field === ID + "_title" ||
+			field === ID + "_uuid"
 		);
 	} else {
 		return (
-			field === "fullname" ||
-			field === "shortname" ||
-			field === "number" ||
-			field === "name" ||
-			field === "address" ||
-			field === "lat" ||
-			field === "lon" ||
-			field === "seats" ||
-			field === "type" ||
-			field === "furniture" ||
-			field === "href"
+			field === ID + "_fullname" ||
+			field === ID + "_shortname" ||
+			field === ID + "_number" ||
+			field === ID + "_name" ||
+			field === ID + "_address" ||
+			field === ID + "_lat" ||
+			field === ID + "_lon" ||
+			field === ID + "_seats" ||
+			field === ID + "_type" ||
+			field === ID + "_furniture" ||
+			field === ID + "_href"
 		);
 	}
 }

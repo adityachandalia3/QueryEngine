@@ -41,12 +41,11 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 
 function sortResultsBy(order: string | Sort | undefined, results: InsightResult[], id: string) {
 	if (typeof order === "string") {
-		let field: string = id + "_" + order;
 		results.sort((a, b) => {
-			if (a[field] < b[field]) {
+			if (a[order] < b[order]) {
 				return -1;
 			}
-			if (a[field] > b[field]) {
+			if (a[order] > b[order]) {
 				return 1;
 			}
 			return 0;
@@ -105,16 +104,7 @@ function dataToInsightResults(data: any[], id: string, columns: string[]): Insig
 	for (const d of data) {
 		let result: InsightResult = {};
 		for (const col of columns) {
-			result[id + "_" + col] = d[col];
-
-			// TODO
-
-			// if (col is a regular field) {
-			// 	result[id + "_" + col] = d[col];
-			// } else {
-			// 	// col/applykey must be a field in res/filteredData
-			// 	result[col] = d[col];
-			// }
+			result[col] = d[col];
 		}
 		results.push(result);
 	}
