@@ -11,7 +11,7 @@ import {Query} from "./PerformQuery/Query";
 import JSZip from "jszip";
 import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation";
 import {isValidId} from "./Helpers";
-import * as AD from "./AddDataset";
+import * as AD from "./AddDataset/AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
 import {saveDataset, saveIds, loadDataset, loadIds, updateIds, unlinkDataset} from "./FileUtils";
 import * as fs from "fs";
