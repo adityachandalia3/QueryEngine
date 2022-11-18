@@ -95,7 +95,7 @@ export default class InsightFacade implements IInsightFacade {
 		try {
 			id = checkAndStripId(JSON.stringify(query));
 		} catch (err) {
-			console.log((err as Error).message);
+			// console.log((err as Error).message);
 			return Promise.reject(err);
 		}
 
@@ -104,7 +104,7 @@ export default class InsightFacade implements IInsightFacade {
 				try {
 					validateQuery(query, this.currentDataset.kind);
 				} catch (err) {
-					console.log((err as Error).message);
+					// console.log((err as Error).message);
 					return Promise.reject(err);
 				}
 				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
@@ -117,7 +117,7 @@ export default class InsightFacade implements IInsightFacade {
 						try {
 							validateQuery(query as Query, this.currentDataset.kind);
 						} catch (err) {
-							console.log((err as Error).message);
+							// console.log((err as Error).message);
 							return Promise.reject(err);
 						}
 						return evaluateQuery(this.currentDataset as Dataset, query as Query);
