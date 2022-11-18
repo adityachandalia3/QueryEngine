@@ -73,7 +73,7 @@ describe("QueryRoomsAndAggregation", function () {
 			"./test/resources/roomQueries",
 			{
 				assertOnResult: (actual, expected) => {
-					expect(actual).to.deep.equal(expected);
+					expect(actual).to.have.deep.members(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
@@ -118,7 +118,7 @@ describe("QueryRoomsAndAggregation", function () {
 			"./test/resources/aggregationQueries",
 			{
 				assertOnResult: (actual, expected) => {
-					expect(actual).to.deep.equal(expected);
+					expect(actual).to.have.deep.members(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
