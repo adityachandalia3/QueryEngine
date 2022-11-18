@@ -27,7 +27,7 @@ describe("Integration", function () {
 		console.log(await facade.addDataset("sections2", content, InsightDatasetKind.Sections));
 
 		let ir: InsightResult[] = await facade.performQuery(and);
-		expect(ir).to.have.deep.members(andResult);
+		expect(ir).to.deep.equal(andResult);
 	});
 
 	it("should query on previously added dataset", async function () {
@@ -38,7 +38,7 @@ describe("Integration", function () {
 		facade = new InsightFacade();
 
 		let ir: InsightResult[] = await facade.performQuery(and);
-		expect(ir).to.have.deep.members(andResult);
+		expect(ir).to.deep.equal(andResult);
 	});
 });
 

@@ -73,8 +73,7 @@ describe("QueryRoomsAndAggregation", function () {
 			"./test/resources/roomQueries",
 			{
 				assertOnResult: (actual, expected) => {
-					// does not test for order as ties may be broken differently
-					expect(actual).to.have.deep.members(expected);
+					expect(actual).to.deep.equal(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
@@ -100,7 +99,7 @@ describe("QueryRoomsAndAggregation", function () {
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
 				facade.addDataset("sections", content, InsightDatasetKind.Sections),
-				// facade.addDataset("rooms", roomContent, InsightDatasetKind.Sections),
+				facade.addDataset("rooms", roomContent, InsightDatasetKind.Rooms),
 			];
 
 			return Promise.all(loadDatasetPromises);
@@ -119,8 +118,7 @@ describe("QueryRoomsAndAggregation", function () {
 			"./test/resources/aggregationQueries",
 			{
 				assertOnResult: (actual, expected) => {
-					// does not test for order as ties may be broken differently
-					expect(actual).to.have.deep.members(expected);
+					expect(actual).to.deep.equal(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",

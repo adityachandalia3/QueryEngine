@@ -32,9 +32,8 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	if (results.length > maxResultLength) {
 		throw new ResultTooLargeError(results.length + " found sections/rooms");
 	}
-	// console.log(results)
-	// TODO implement C2 sorting
 	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
+	// console.log(results)
 	return results;
 }
 
@@ -47,10 +46,23 @@ function sortResultsBy(order: string | Sort | undefined, results: InsightResult[
 			if (a[order] > b[order]) {
 				return 1;
 			}
-			return 0;
+			return -1;
 		});
 	} else if (order !== undefined) {
-		throw new Error("TODO: C2 ordering not implemented yet");
+		results.sort((a, b) => {
+			for (const k of order.keys) {
+				if (a[k] < b[k]) {
+					return -1;
+				}
+				if (a[k] > b[k]) {
+					return 1;
+				}
+			}
+			return -1;
+		});
+		if (order.dir === "DOWN") {
+			results.reverse();
+		}
 	}
 }
 

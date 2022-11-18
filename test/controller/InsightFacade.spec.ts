@@ -776,7 +776,6 @@ describe("InsightFacade", function () {
 			"./test/resources/queries",
 			{
 				assertOnResult: (actual, expected) => {
-					// does not test for order
 					expect(actual).to.deep.equal(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
