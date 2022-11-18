@@ -59,7 +59,7 @@ export default class InsightFacade implements IInsightFacade {
 					return AD.zipToSectionsDataset(zip, id);
 				}
 			})
-			.then(async (dataset) => {
+			.then((dataset) => {
 				if (dataset.numRows < 1) {
 					return Promise.reject(new InsightError("Dataset Contains less than one valid section/room!"));
 				}
@@ -75,7 +75,7 @@ export default class InsightFacade implements IInsightFacade {
 
 
 	public removeDataset(id: string): Promise<string> {
-		return updateIds(this.currentIds).then(async (ids) => {
+		return updateIds(this.currentIds).then((ids) => {
 			if (!isValidId(id)) {
 				return Promise.reject(new InsightError("id is not valid"));
 			}
@@ -85,7 +85,8 @@ export default class InsightFacade implements IInsightFacade {
 			} else {
 				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-			return unlinkDataset(id);
+			// return unlinkDataset(id);
+			return;
 		}).then(() => {
 			return saveIds(this.currentIds as string[]).then(() => {
 				return id;
@@ -136,7 +137,7 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 
-	public async listDatasets(): Promise<InsightDataset[]> {
+	public listDatasets(): Promise<InsightDataset[]> {
 		let insightDatasets: InsightDataset[] = [];
 		let promises: any[] = [];
 		return updateIds(this.currentIds)

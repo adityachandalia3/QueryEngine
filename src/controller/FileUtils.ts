@@ -44,7 +44,7 @@ export function loadDataset(id: string): Promise<Dataset> {
 		});
 }
 
-export async function unlinkDataset(id: string): Promise<any> {
+export function unlinkDataset(id: string): Promise<any> {
 	return fs.promises.unlink(persistDir + id + ".JSON");
 }
 
@@ -72,7 +72,7 @@ export function saveIds(ids: string[]): Promise<string[]> {
  * @param ids
  * @returns
  */
-export async function updateIds(ids: string[] | null): Promise<string[]> {
+export function updateIds(ids: string[] | null): Promise<string[]> {
 	if (ids === null) {
 		return loadIds();
 	} else {
