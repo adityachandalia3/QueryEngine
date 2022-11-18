@@ -32,8 +32,7 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	if (results.length > maxResultLength) {
 		throw new ResultTooLargeError(results.length + " found sections/rooms");
 	}
-	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
-	// console.log(results)
+	// sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
 	return results;
 }
 
