@@ -73,27 +73,27 @@ function parseRoomData(id: string, zipContent: any[], links: string[]): Dataset 
 	let tableContent: any[] = [];
 	let shortname, href, fullname, address: any;
 	for (const zc of zipContent) {
-		// if (zc.htmlContent === "") {
-		// 	continue;
-		// }
-		// let parsedZCContent = parse(zc.htmlContent);
-		// let tbodyNode: any[] = searchNodeTag(parsedZCContent, "tbody");
-		// if (tbodyNode) {
-		// 	tableContent = arrayManipulation(getTableContent(tbodyNode));
-		// 	let buildingInfoScope = searchNodeAttr(parsedZCContent, "id", "building-info");
-		// 	if (buildingInfoScope) {
-		// 		fullname = getFullname(buildingInfoScope);
-		// 		address = getAddressInfo(buildingInfoScope);
-		// 		shortname = String(zc.file).substring(0, String(zc.file).length - 4);
-		// 		let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
-		// 		href = "http://students.ubc.ca/" + links[index1];
-		// 	} else {
-		// 		continue;
-		// 	};
-		// 	roomsResult.push(...resultsToRooms(id, tableContent, shortname, href, fullname, address));
-		// } else {
-		// 	continue;
-		// }
+		if (zc.htmlContent === "") {
+			continue;
+		}
+		let parsedZCContent = parse(zc.htmlContent);
+		let tbodyNode: any[] = searchNodeTag(parsedZCContent, "tbody");
+		if (tbodyNode) {
+			tableContent = arrayManipulation(getTableContent(tbodyNode));
+			let buildingInfoScope = searchNodeAttr(parsedZCContent, "id", "building-info");
+			if (buildingInfoScope) {
+				fullname = getFullname(buildingInfoScope);
+				address = getAddressInfo(buildingInfoScope);
+				shortname = String(zc.file).substring(0, String(zc.file).length - 4);
+				let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
+				href = "http://students.ubc.ca/" + links[index1];
+			} else {
+				continue;
+			};
+			roomsResult.push(...resultsToRooms(id, tableContent, shortname, href, fullname, address));
+		} else {
+			continue;
+		}
 	}
 	return new RoomsDataset(id, roomsResult.length, roomsResult);
 }

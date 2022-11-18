@@ -146,27 +146,25 @@ function getField(key: Mkey | Skey): string {
 	throw new Error("Invalid state.");
 }
 function applyTransformation(results: any[], query: Query): InsightResult[] {
-	// 1. Group -> will only have one result per group
 	let groups: Map<string, any> = groupResults(results, query.TRANSFORMATIONS.GROUP);
 
-	// 2. Apply
 	return apply(groups, query.TRANSFORMATIONS.GROUP, query.TRANSFORMATIONS.APPLY);
 }
 
 function groupResults(results: any[], groupNames: string[]): Map<string, any> {
 	let groupedResults = new Map<string, any[]>();
 
-	results.forEach((result) => {
-		let key = "";
-		for (const group of groupNames) {
-			key += result[group];
-		}
-		if (groupedResults.has(key)) {
-			groupedResults.get(key)?.push(result);
-		} else {
-			groupedResults.set(key, [result]);
-		}
-	});
+	// results.forEach((result) => {
+	// 	let key = "";
+	// 	for (const group of groupNames) {
+	// 		key += result[group];
+	// 	}
+	// 	if (groupedResults.has(key)) {
+	// 		groupedResults.get(key)?.push(result);
+	// 	} else {
+	// 		groupedResults.set(key, [result]);
+	// 	}
+	// });
 	return groupedResults;
 }
 
