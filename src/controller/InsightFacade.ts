@@ -85,11 +85,8 @@ export default class InsightFacade implements IInsightFacade {
 			} else {
 				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-			try {
-				await unlinkDataset(id);
-			} catch (err) {
-				return Promise.reject(err);
-			}
+			return unlinkDataset(id);
+		}).then(() => {
 			return saveIds(this.currentIds as string[]).then(() => {
 				return id;
 			});
