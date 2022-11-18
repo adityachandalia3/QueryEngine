@@ -91,22 +91,32 @@ export function validateFilter(filter: Filter) {
 		if (!isMkey(filter.LT)) {
 			throw new InsightError("Invalid key in LT");
 		}
+		checkFilterKeyIsKey(filter.LT);
 	} else if (filter.GT !== undefined) {
 		if (!isMkey(filter.GT)) {
 			throw new InsightError("Invalid key in GT");
 		}
+		checkFilterKeyIsKey(filter.GT);
 	} else if (filter.EQ !== undefined) {
 		if (!isMkey(filter.EQ)) {
 			throw new InsightError("Invalid key in EQ");
 		}
+		checkFilterKeyIsKey(filter.EQ);
 	} else if (filter.IS !== undefined) {
 		if (!isSkey(filter.IS)) {
 			throw new InsightError("Invalid key in IS");
 		}
+		checkFilterKeyIsKey(filter.IS);
 	} else if (filter.NOT !== undefined) {
 		validateFilter(filter.NOT as Filter);
 	} else {
 		throw new InsightError("Invalid filter key");
+	}
+}
+
+function checkFilterKeyIsKey(key: Mkey | Skey) {
+	if (!Object.keys(key).reduce((a,b) => a || isKey(b), false)) {
+		throw new InsightError("Invalid key field");
 	}
 }
 
@@ -245,29 +255,19 @@ function isToken(token: string): boolean {
 export function isKey(field: string): boolean {
 	if (isSections) {
 		return (
-			field === ID + "_avg" ||
-			field === ID + "_pass" ||
-			field === ID + "_fail" ||
-			field === ID + "_audit" ||
-			field === ID + "_year" ||
-			field === ID + "_dept" ||
-			field === ID + "_id" ||
-			field === ID + "_instructor" ||
-			field === ID + "_title" ||
-			field === ID + "_uuid"
+			field === ID + "_avg" || field === ID + "_pass" ||
+			field === ID + "_fail" || field === ID + "_audit" ||
+			field === ID + "_year" || field === ID + "_dept" ||
+			field === ID + "_id" || field === ID + "_instructor" ||
+			field === ID + "_title" || field === ID + "_uuid"
 		);
 	} else {
 		return (
-			field === ID + "_fullname" ||
-			field === ID + "_shortname" ||
-			field === ID + "_number" ||
-			field === ID + "_name" ||
-			field === ID + "_address" ||
-			field === ID + "_lat" ||
-			field === ID + "_lon" ||
-			field === ID + "_seats" ||
-			field === ID + "_type" ||
-			field === ID + "_furniture" ||
+			field === ID + "_fullname" || field === ID + "_shortname" ||
+			field === ID + "_number" || field === ID + "_name" ||
+			field === ID + "_address" || field === ID + "_lat" ||
+			field === ID + "_lon" || field === ID + "_seats" ||
+			field === ID + "_type" || field === ID + "_furniture" ||
 			field === ID + "_href"
 		);
 	}
