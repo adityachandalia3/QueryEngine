@@ -65,9 +65,11 @@ export default class InsightFacade implements IInsightFacade {
 				}
 				this.currentDataset = dataset;
 				(this.currentIds as string[]).push(id);
-				await saveDataset(dataset);
-				await saveIds(this.currentIds as string[]);
-				return Promise.resolve(this.currentIds || []);
+				return saveDataset(dataset);
+			}).then(() => {
+				return saveIds(this.currentIds as string[]);
+			}).then(() => {
+				return this.currentIds || [];
 			});
 	}
 
@@ -83,9 +85,14 @@ export default class InsightFacade implements IInsightFacade {
 			} else {
 				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-			await unlinkDataset(id);
-			await saveIds(this.currentIds as string[]);
-			return Promise.resolve(id);
+			try {
+				await unlinkDataset(id);
+			} catch (err) {
+				return Promise.reject(err);
+			}
+			return saveIds(this.currentIds as string[]).then(() => {
+				return id;
+			});
 		});
 	}
 

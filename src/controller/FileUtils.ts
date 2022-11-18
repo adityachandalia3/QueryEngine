@@ -17,13 +17,10 @@ const persistDir = "./data/";
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
 export function saveDataset(dataset: Dataset): Promise<string> {
-	try {
-		return fs.outputJson(persistDir + dataset.id + ".JSON", dataset).then(async () => {
-			return Promise.resolve(dataset.id);
-		});
-	} catch {
-		return Promise.reject(new InsightError("Unable to save file"));
-	}
+	return fs.outputJson(persistDir + dataset.id + ".JSON", dataset).then(() => {
+		return Promise.resolve(dataset.id);
+	});
+		// return Promise.reject(new InsightError("Unable to save file"));
 }
 
 /**
@@ -60,7 +57,7 @@ export function loadIds(): Promise<string[]> {
 		(ids) => ids,
 		(err) => {
 			if (err.code !== "ENOENT") {
-				throw err;
+				return Promise.reject(err);
 			}
 			return Promise.resolve([]);
 		}
@@ -68,7 +65,7 @@ export function loadIds(): Promise<string[]> {
 }
 
 export function saveIds(ids: string[]): Promise<string[]> {
-	return fs.outputJson(persistDir + "ids" + ".JSON", ids).then(async () => {
+	return fs.outputJson(persistDir + "ids" + ".JSON", ids).then(() => {
 		return Promise.resolve(ids);
 	});
 }
