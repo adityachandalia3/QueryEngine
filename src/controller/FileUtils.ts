@@ -1,5 +1,5 @@
-import {Dataset} from "./Dataset";
-import {InsightError} from "./IInsightFacade";
+import {Dataset, SectionsDataset} from "./Dataset";
+import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 import * as fs from "fs-extra";
 
 const persistDir = "./data/";
@@ -38,11 +38,13 @@ export function saveDataset(dataset: Dataset): Promise<string> {
  * The promise should fulfill with an InsightError (for any other source of failure) describing the error.
  */
 export function loadDataset(id: string): Promise<Dataset> {
-	try {
-		return fs.readJson(persistDir + id + ".JSON");
-	} catch {
-		return Promise.reject(new InsightError("Could not read file with given id"));
-	}
+	return fs.readJson(persistDir + id + ".JSON").then(
+		(ret) => {
+			return new Dataset(ret.id, ret.kind, ret.numRows, ret.data);
+		},
+		(err) => {
+			return Promise.reject(new InsightError("Could not read file with given id"));
+		});
 }
 
 export async function unlinkDataset(id: string) {
@@ -55,9 +57,7 @@ export async function unlinkDataset(id: string) {
 
 export function loadIds(): Promise<string[]> {
 	return fs.readJson(persistDir + "ids" + ".JSON").then(
-		(ids) => {
-			return Promise.resolve(ids);
-		},
+		(ids) => ids,
 		(err) => {
 			if (err.code !== "ENOENT") {
 				throw err;

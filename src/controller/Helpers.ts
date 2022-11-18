@@ -20,6 +20,3 @@ export function isValidId(id: string): boolean {
 	return true;
 }
 
-export function containsId(id: string): boolean {
-	return true;
-}

@@ -1,0 +1,25 @@
+{
+	"title": "underscoreInApplykey3",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"APPLY": [
+				{
+					"sections_avg": {
+						"AVG": "sections_avg"
+					}
+				}
+			],
+			"GROUP": [
+				"sections_title"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

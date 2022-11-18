@@ -1,0 +1,243 @@
+{
+	"title": "applyMin",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": "cpsc"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"c"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"sections_title"
+			],
+			"APPLY": [
+				{
+					"c": {
+						"MIN": "sections_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_title": "comptn, progrmng",
+			"c": 67.79
+		},
+		{
+			"sections_title": "model comptn",
+			"c": 67.13
+		},
+		{
+			"sections_title": "sftwr constructn",
+			"c": 68.13
+		},
+		{
+			"sections_title": "intro comp sys",
+			"c": 64.62
+		},
+		{
+			"sections_title": "basic alg&data",
+			"c": 65.1
+		},
+		{
+			"sections_title": "dta&alg elec eng",
+			"c": 72.4
+		},
+		{
+			"sections_title": "basics comp syst",
+			"c": 67.91
+		},
+		{
+			"sections_title": "comptng life sci",
+			"c": 71
+		},
+		{
+			"sections_title": "num comp alg prb",
+			"c": 68.64
+		},
+		{
+			"sections_title": "num approx/discr",
+			"c": 68.35
+		},
+		{
+			"sections_title": "intr rel databse",
+			"c": 71.89
+		},
+		{
+			"sections_title": "intr sftwr eng",
+			"c": 72.27
+		},
+		{
+			"sections_title": "programmng langs",
+			"c": 72.83
+		},
+		{
+			"sections_title": "func & logic prg",
+			"c": 76.52
+		},
+		{
+			"sections_title": "comp hard&os",
+			"c": 70.46
+		},
+		{
+			"sections_title": "comp graphics",
+			"c": 67.85
+		},
+		{
+			"sections_title": "internet comp",
+			"c": 68.54
+		},
+		{
+			"sections_title": "softwr eng proj",
+			"c": 78.93
+		},
+		{
+			"sections_title": "intr alg dsgn&an",
+			"c": 66.34
+		},
+		{
+			"sections_title": "artificial intel",
+			"c": 67.48
+		},
+		{
+			"sections_title": "machine lrn mine",
+			"c": 68.4
+		},
+		{
+			"sections_title": "hum-com interact",
+			"c": 73.3
+		},
+		{
+			"sections_title": "adv rel databse",
+			"c": 68.76
+		},
+		{
+			"sections_title": "adv software eng",
+			"c": 74.04
+		},
+		{
+			"sections_title": "compiler constrc",
+			"c": 72.24
+		},
+		{
+			"sections_title": "adv opertng sysm",
+			"c": 68.79
+		},
+		{
+			"sections_title": "distrbt'd systms",
+			"c": 71.75
+		},
+		{
+			"sections_title": "parallel comput",
+			"c": 75.61
+		},
+		{
+			"sections_title": "adv alg dsgn&anl",
+			"c": 68.77
+		},
+		{
+			"sections_title": "theory comptg",
+			"c": 69.47
+		},
+		{
+			"sections_title": "intel systems",
+			"c": 66.13
+		},
+		{
+			"sections_title": "computer vision",
+			"c": 71.8
+		},
+		{
+			"sections_title": "comptr & society",
+			"c": 72.75
+		},
+		{
+			"sections_title": "hmn-cp interactn",
+			"c": 77.43
+		},
+		{
+			"sections_title": "alg in bioin",
+			"c": 73.18
+		},
+		{
+			"sections_title": "honours thesis",
+			"c": 83.08
+		},
+		{
+			"sections_title": "student seminar",
+			"c": 84.5
+		},
+		{
+			"sections_title": "fund alg dsgn&an",
+			"c": 78.87
+		},
+		{
+			"sections_title": "thry of automata",
+			"c": 83.8
+		},
+		{
+			"sections_title": "artif intell 1",
+			"c": 81.06
+		},
+		{
+			"sections_title": "computl ling 1",
+			"c": 79.25
+		},
+		{
+			"sections_title": "software eng",
+			"c": 82.5
+		},
+		{
+			"sections_title": "prog lang princ",
+			"c": 84.25
+		},
+		{
+			"sections_title": "intgrt sys desgn",
+			"c": 64
+		},
+		{
+			"sections_title": "comput robotics",
+			"c": 79.88
+		},
+		{
+			"sections_title": "para algs & arch",
+			"c": 82.65
+		},
+		{
+			"sections_title": "artif intell 2",
+			"c": 82.55
+		},
+		{
+			"sections_title": "comp comm protcl",
+			"c": 83.78
+		},
+		{
+			"sections_title": "machine learn i",
+			"c": 81.12
+		},
+		{
+			"sections_title": "phy user intfc",
+			"c": 82.07
+		},
+		{
+			"sections_title": "hmn-cmpt intract",
+			"c": 81.64
+		},
+		{
+			"sections_title": "info visualizatn",
+			"c": 88.47
+		},
+		{
+			"sections_title": "m.sc major essay",
+			"c": 75
+		}
+	]
+}

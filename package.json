@@ -13,7 +13,7 @@
 		"express": "4.17.2",
 		"fs-extra": "10.0.0",
 		"jszip": "3.7.1",
-		"parse5": "7.1.1"
+		"parse5": "^7.1.1"
 	},
 	"devDependencies": {
 		"@tsconfig/node16": "1.0.2",
@@ -23,6 +23,7 @@
 		"@types/fs-extra": "9.0.13",
 		"@types/mocha": "9.0.0",
 		"@types/node": "18.7.16",
+		"@types/parse5": "^7.0.0",
 		"@typescript-eslint/eslint-plugin": "5.9.0",
 		"@typescript-eslint/parser": "5.9.0",
 		"@ubccpsc310/folder-test": "2.0.1",

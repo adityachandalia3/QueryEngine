@@ -1,4 +1,4 @@
-import {Dataset, Section} from "./Dataset";
+import {SectionsDataset, Section, Dataset} from "./Dataset";
 import {
 	IInsightFacade,
 	InsightDataset,
@@ -10,11 +10,13 @@ import {
 import {Query} from "./PerformQuery/Query";
 import JSZip from "jszip";
 import {checkAndStripId, isQuery, validateQuery} from "./PerformQuery/Validation";
-import {containsId, isValidId} from "./Helpers";
-import * as AD from "./AddDataset";
+import {isValidId} from "./Helpers";
+import * as AD from "./AddDataset/AddDataset";
 import {evaluateQuery} from "./PerformQuery/Evaluation";
 import {saveDataset, saveIds, loadDataset, loadIds, updateIds, unlinkDataset} from "./FileUtils";
 import * as fs from "fs";
+import {html, parse} from "parse5";
+
 
 /**
  * This is the main programmatic entry point for the project.
@@ -48,37 +50,27 @@ export default class InsightFacade implements IInsightFacade {
 				if (this.currentIds.includes(id)) {
 					return Promise.reject(new InsightError("dataset with same id has already been added"));
 				}
-				if (kind === InsightDatasetKind.Rooms) {
-					return Promise.reject(new InsightError("Dataset of Rooms not allowed!"));
-				}
 				return JSZip.loadAsync(content, {base64: true});
 			})
 			.then((zip) => {
-				let [promises, zipContent] = AD.zipToContent(zip);
-				return Promise.all(promises).then(async () => {
-					let sections: Section[] = [];
-					for (const zc of zipContent) {
-						if (zc.content === "") {
-							continue;
-						}
-						let results: AD.Result[] = (JSON.parse(zc.content) as AD.Content).result;
-						if (results.length > 0) {
-							sections = sections.concat(AD.resultsToSections(results));
-						}
-					}
-					this.currentDataset = new Dataset(id, kind, sections.length, sections);
-					if (sections.length < 1) {
-						return Promise.reject(new InsightError("Dataset Contains less than one valid section!"));
-					}
-					(this.currentIds as string[]).push(id);
-					await saveDataset(this.currentDataset);
-					await saveIds(this.currentIds as string[]);
-				});
+				if (kind === InsightDatasetKind.Rooms) {
+					return AD.zipToRoomsDataset(zip, id);
+				} else {
+					return AD.zipToSectionsDataset(zip, id);
+				}
 			})
-			.then(() => {
+			.then(async (dataset) => {
+				if (dataset.numRows < 1) {
+					return Promise.reject(new InsightError("Dataset Contains less than one valid section/room!"));
+				}
+				this.currentDataset = dataset;
+				(this.currentIds as string[]).push(id);
+				await saveDataset(dataset);
+				await saveIds(this.currentIds as string[]);
 				return Promise.resolve(this.currentIds || []);
 			});
 	}
+
 
 	public removeDataset(id: string): Promise<string> {
 		return updateIds(this.currentIds).then(async (ids) => {
@@ -99,38 +91,41 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		let id: string;
-		let queryString: string;
 
 		try {
-			[id, queryString] = checkAndStripId(JSON.stringify(query));
+			id = checkAndStripId(JSON.stringify(query));
 		} catch (err) {
 			console.log((err as Error).message);
 			return Promise.reject(err);
 		}
 
-		query = JSON.parse(queryString);
-
 		if (isQuery(query)) {
-			try {
-				validateQuery(query);
-			} catch (err) {
-				console.log((err as Error).message);
-				return Promise.reject(err);
-			}
 			if (this.currentDataset !== null && this.currentDataset.id === id) {
+				try {
+					validateQuery(query, this.currentDataset.kind);
+				} catch (err) {
+					console.log((err as Error).message);
+					return Promise.reject(err);
+				}
 				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
 			} else {
 				return updateIds(this.currentIds).then(() => {
-					return loadDataset(id).then(
-						(dataset) => {
-							this.currentDataset = dataset;
-							return evaluateQuery(this.currentDataset as Dataset, query as Query);
-						},
-						(err) => {
+					return loadDataset(id);
+				}).then(
+					(dataset) => {
+						this.currentDataset = dataset;
+						try {
+							validateQuery(query as Query, this.currentDataset.kind);
+						} catch (err) {
+							console.log((err as Error).message);
 							return Promise.reject(err);
 						}
-					);
-				});
+						return evaluateQuery(this.currentDataset as Dataset, query as Query);
+					},
+					(err) => {
+						return Promise.reject(err);
+					}
+				);
 			}
 		} else {
 			return Promise.reject(new InsightError("Query given is not a valid query"));
