@@ -85,8 +85,8 @@ function parseRoomData(id: string, zipContent: any[], links: string[]): Dataset 
 				fullname = getFullname(buildingInfoScope);
 				address = getAddressInfo(buildingInfoScope);
 				shortname = String(zc.file).substring(0, String(zc.file).length - 4);
-				let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
-				href = "http://students.ubc.ca/" + links[index1];
+				// let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
+				href = "http://students.ubc.ca/";// + links[index1];
 			} else {
 				continue;
 			};
