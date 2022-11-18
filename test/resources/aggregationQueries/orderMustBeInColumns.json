@@ -1,0 +1,26 @@
+{
+	"title": "orderMustBeInColumns",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_title": "cp*"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"sections_avg"
+			],
+			"ORDER": "sections_pass"
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"sections_title",
+				"sections_avg"
+			],
+			"APPLY": []
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

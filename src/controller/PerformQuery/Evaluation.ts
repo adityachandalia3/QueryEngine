@@ -1,6 +1,7 @@
+import Decimal from "decimal.js";
 import {SectionsDataset, Section, Dataset} from "../Dataset";
 import {InsightError, InsightResult, ResultTooLargeError} from "../IInsightFacade";
-import {Query, Filter, Mkey, Skey, Sort} from "./Query";
+import {Query, Filter, Mkey, Skey, Sort, ApplyRule, ApplyBody} from "./Query";
 
 /**
  * Apply query to dataset and return result
@@ -21,15 +22,17 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 	} else {
 		filteredData = evaluateFilter(dataset.getData(), query.WHERE);
 	}
-
+	let results: InsightResult[] = filteredData;
 	if (query.TRANSFORMATIONS !== undefined) {
-		filteredData = applyTransformation(filteredData, query);
+		results = applyTransformation(results, query);
 	}
 
-	if (filteredData.length > maxResultLength) {
-		throw new ResultTooLargeError(filteredData.length + " found sections/rooms");
+	results = dataToInsightResults(results, query.OPTIONS.COLUMNS);
+
+	if (results.length > maxResultLength) {
+		throw new ResultTooLargeError(results.length + " found sections/rooms");
 	}
-	let results: InsightResult[] = dataToInsightResults(filteredData, dataset.id, query.OPTIONS.COLUMNS);
+	// console.log(results)
 	// TODO implement C2 sorting
 	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
 	return results;
@@ -51,7 +54,7 @@ function sortResultsBy(order: string | Sort | undefined, results: InsightResult[
 	}
 }
 
-function evaluateFilter(data: any[], filter: Filter): any[] {
+function evaluateFilter(data: any[], filter: Filter): InsightResult[] {
 	let result: any[] = [];
 	if (filter.AND) {
 		result = data;
@@ -95,7 +98,7 @@ function evaluateFilter(data: any[], filter: Filter): any[] {
  * @returns translated InsightResults
  *
  */
-function dataToInsightResults(data: any[], id: string, columns: string[]): InsightResult[] {
+function dataToInsightResults(data: any[], columns: string[]): InsightResult[] {
 	let results: InsightResult[] = [];
 	for (const d of data) {
 		let result: InsightResult = {};
@@ -124,19 +127,95 @@ function isMatch(field: string, comparator: string): boolean {
 }
 
 function getField(key: Mkey | Skey): string {
-	for (const [k,v] of Object.entries(key)) {
+	for (const [k, v] of Object.entries(key)) {
 		if (v !== undefined) {
 			return k;
 		}
 	}
 	throw new Error("Invalid state.");
 }
-function applyTransformation(results: any[], query: Query): any[] {
-	// add fields/applykeys to filteredData?
+function applyTransformation(results: any[], query: Query): InsightResult[] {
+	// 1. Group -> will only have one result per group
+	let groups: Map<string, any> = groupResults(results, query.TRANSFORMATIONS.GROUP);
 
-	// 1. Group
-	// let groups: any[][] = groupResults(results, query.TRANSFORMATIONS.GROUP)
 	// 2. Apply
+	return apply(groups, query.TRANSFORMATIONS.GROUP, query.TRANSFORMATIONS.APPLY);
+}
+
+function groupResults(results: any[], groupNames: string[]): Map<string, any> {
+	let groupedResults = new Map<string, any[]>();
+
+	results.forEach((result) => {
+		let key = "";
+		for (const group of groupNames) {
+			key += result[group];
+		}
+		if (groupedResults.has(key)) {
+			groupedResults.get(key)?.push(result);
+		} else {
+			groupedResults.set(key, [result]);
+		}
+	});
+	return groupedResults;
+}
+
+function apply(groupedResults: Map<string, any>, groupNames: string[], applyRules: ApplyRule[]): InsightResult[] {
+	let results: InsightResult[] = [];
+	for (const group of groupedResults.values()) {
+		let result: InsightResult = {};
+		for (const rule of applyRules) {
+			// apply the rule
+			let applyResult: number = calculate(Object.values(rule)[0], group);
+
+			result[Object.keys(rule)[0]] = applyResult;
+		}
+		for (const name of groupNames) {
+			result[name] = group[0][name];
+		}
+		results.push(result);
+	}
 	return results;
+}
+
+function calculate(token: ApplyBody, group: []): number {
+	if (token.COUNT !== undefined) {
+		let fields = new Set();
+		for (const result of group) {
+			fields.add(result[token.COUNT]);
+		}
+		return fields.size;
+	} else if (token.AVG !== undefined) {
+		let total = new Decimal(0);
+		for (const result of group) {
+			total = total.add(result[token.AVG]);
+		}
+		let avg = total.toNumber() / group.length;
+		let res = Number(avg.toFixed(2));
+		return res;
+	} else if (token.MAX !== undefined) {
+		let max = Number.MIN_VALUE;
+		for (const result of group) {
+			if (result[token.MAX] > max) {
+				max = result[token.MAX];
+			}
+		}
+		return max;
+	} else if (token.MIN !== undefined) {
+		let min = Number.MAX_VALUE;
+		for (const result of group) {
+			if (result[token.MIN] < min) {
+				min = result[token.MIN];
+			}
+		}
+		return min;
+	} else {
+		// token.SUM
+		let total = new Decimal(0);
+		for (const result of group) {
+			total = total.add(result[token.SUM]);
+		}
+		let res = Number(total.toFixed(2));
+		return res;
+	}
 }
 

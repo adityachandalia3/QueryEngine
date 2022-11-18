@@ -1,0 +1,433 @@
+{
+	"title": "applyCount",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_title": "cp*"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"sections_avg",
+				"c"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"sections_title",
+				"sections_avg"
+			],
+			"APPLY": [
+				{
+					"c": {
+						"COUNT": "sections_instructor"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 84,
+			"c": 2
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 82.17,
+			"c": 2
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 82.25,
+			"c": 2
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 85.21,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 82.91,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 83.95,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 83.38,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 83.14,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 83.25,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 81.6,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 84.18,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 82.95,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 83.29,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 80.65,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 82.3,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 83.21,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 82.94,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl budgeting",
+			"sections_avg": 83.08,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 74.76,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 70.22,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 73.81,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 72.08,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 69.85,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 70.49,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 70.2,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 71.88,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 68.68,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 73.33,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 71.2,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 68.24,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 74.47,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 75.88,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 75.2,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 69.55,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 71.07,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 70.3,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 71.39,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 68.07,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 69.81,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 64.99,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 72.89,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 68.04,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 69.14,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 68.51,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 60.69,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 65.24,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 69.57,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 67.44,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 70.56,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 70.23,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 65.79,
+			"c": 1
+		},
+		{
+			"sections_title": "cptl mrkts&rl es",
+			"sections_avg": 67.85,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 71.11,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 62.94,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 67.03,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 53.91,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 67.62,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 61.33,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 59.56,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 56.88,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 57.84,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 66.67,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 64.95,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 66.04,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 67.9,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 63.73,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 66.17,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 75.67,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 73.74,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 74.36,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 46.5,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 66.35,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 60,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 72.06,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 74.67,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 73.48,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 73.71,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 70.39,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 63.75,
+			"c": 1
+		},
+		{
+			"sections_title": "cpt aid ms pr as",
+			"sections_avg": 67.3,
+			"c": 1
+		}
+	]
+}
