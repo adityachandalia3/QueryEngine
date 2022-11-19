@@ -4,7 +4,7 @@ import {InsightDatasetKind, InsightError} from "../IInsightFacade";
 import {parse} from "parse5";
 import {searchNodeTag, getLinks, arrayManipulation, getTableContent,
 	searchNodeAttr, getFullname, getAddressInfo} from "./RoomParsing";
-
+import http from "http";
 
 export interface Content {
 	result: Result[];
@@ -24,6 +24,12 @@ export interface Result {
 	Section: string;
 }
 
+interface GeoResponse {
+	lat?: number;
+	lon?: number;
+	error?: string;
+}
+
 export function zipToSectionsDataset(zip: JSZip, id: string): Promise<Dataset> {
 	let promises = zipToContent(zip);
 	return Promise.all(promises).then((contents) => {
@@ -41,6 +47,9 @@ export function zipToSectionsDataset(zip: JSZip, id: string): Promise<Dataset> {
 	});
 }
 
+// to avoid nested callback
+let links2: string[];
+let files2: any[];
 export function zipToRoomsDataset(zip: JSZip, id: string): Promise<Dataset> {
 	let index = zip.file("index.htm");
 	if (index === null) {
@@ -64,11 +73,22 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<Dataset> {
 				files.push(relativePath);
 			}
 		});
-		return Promise.all(promises).then((p) => parseRoomData(id, p, links, files));
-	});
+		links2 = links;
+		files2 = files;
+		return Promise.all(promises);
+
+	}).then(async (p) => {
+		let dataset: RoomsDataset = parseRoomData(id, p, links2, files2);
+		await Promise.all(dataset.getData().map(async (data) => {
+			let finalGeo: GeoResponse = await getGeolocation(data[id + "_address"] as string);
+			data[id + "_lat"] = finalGeo.lat as number;
+			data[id + "_lon"] = finalGeo.lon as number;
+		}));
+		return dataset;
+	});;
 }
 
-function parseRoomData(id: string, htmlContent: any[], links: string[], files: any[]): Dataset {
+function parseRoomData(id: string, htmlContent: any[], links: string[], files: any[]): RoomsDataset {
 
 	let roomsResult: Room[] = [];
 	let tableContent: any[] = [];
@@ -92,12 +112,39 @@ function parseRoomData(id: string, htmlContent: any[], links: string[], files: a
 			} else {
 				continue;
 			};
-			roomsResult.push(...resultsToRooms(id, tableContent, shortname, href, fullname, address));
+			roomsResult.push(...resultsToRooms(id, tableContent, shortname, href, fullname, address, 0, 0));
 		} else {
 			continue;
 		}
 	}
 	return new RoomsDataset(id, roomsResult.length, roomsResult);
+}
+
+function getGeolocation(address: string): Promise<any> {
+	let geolocAdd: string = "";
+	let geolocation: GeoResponse;
+	let geoArray: any[] = [];
+	let inputAddress = String(address).split(" ");
+	for (const elem of inputAddress){
+		geolocAdd = String(geolocAdd).concat(elem + "%20");
+	}
+	let geoLoc = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team104/" + geolocAdd;
+	geoLoc = geoLoc.substring(0,geoLoc.length - 3);
+	geolocAdd = "";
+	return new Promise((resolve, reject) => {
+		http.get(geoLoc, (result) => {
+			let data = "";
+			result.on("data", (d: any) => {
+				data += d;
+			});
+			result.on("end",(finaldata: any) => {
+				geolocation = JSON.parse(data);
+				resolve(geolocation);
+			});
+		}).on("error", (err) => {
+			reject(err);
+		});
+	});
 }
 
 function zipToContent(zip: JSZip): any[] {
@@ -116,7 +163,7 @@ function zipToContent(zip: JSZip): any[] {
 
 function resultsToRooms(
 	id: string, tableContent: any[], shortname: any,
-	href: any, fullname: any, address: any
+	href: any, fullname: any, address: any, lat: any, lon: any
 ): Room[] {
 	let roomName, number, capacity, furniture, roomType: any;
 	let rooms: Room[] = [];
@@ -138,8 +185,8 @@ function resultsToRooms(
 			[id + "_type"]: roomType,
 			[id + "_furniture"]: furniture,
 			[id + "_href"]: newHref,
-			[id + "_lat"]: 0,
-			[id + "_lon"]: 0,
+			[id + "_lat"]: lat,
+			[id + "_lon"]: lon,
 			[id + "_seats"]: capacity
 		});
 	}
