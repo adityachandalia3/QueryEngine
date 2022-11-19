@@ -122,6 +122,9 @@ function resultsToRooms(
 	let rooms: Room[] = [];
 	for (const content of tableContent) {
 		number = content[0];
+		let temphref = String(href).substring(0, String(href).length - 4);
+		temphref = temphref.slice(0,temphref.lastIndexOf("/")) + "/room" + temphref.slice(temphref.lastIndexOf("/"));
+		let newHref = temphref.concat("-" + number);
 		capacity = parseInt(content[1], 10);
 		furniture = content[2];
 		roomType = content[3];
@@ -134,7 +137,7 @@ function resultsToRooms(
 			[id + "_address"]: address,
 			[id + "_type"]: roomType,
 			[id + "_furniture"]: furniture,
-			[id + "_href"]: href,
+			[id + "_href"]: newHref,
 			[id + "_lat"]: 0,
 			[id + "_lon"]: 0,
 			[id + "_seats"]: capacity
