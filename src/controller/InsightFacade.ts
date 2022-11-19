@@ -59,21 +59,23 @@ export default class InsightFacade implements IInsightFacade {
 					return AD.zipToSectionsDataset(zip, id);
 				}
 			})
-			.then(async (dataset) => {
+			.then((dataset) => {
 				if (dataset.numRows < 1) {
 					return Promise.reject(new InsightError("Dataset Contains less than one valid section/room!"));
 				}
 				this.currentDataset = dataset;
 				(this.currentIds as string[]).push(id);
-				await saveDataset(dataset);
-				await saveIds(this.currentIds as string[]);
-				return Promise.resolve(this.currentIds || []);
+				return saveDataset(dataset);
+			}).then(() => {
+				return saveIds(this.currentIds as string[]);
+			}).then(() => {
+				return this.currentIds || [];
 			});
 	}
 
 
 	public removeDataset(id: string): Promise<string> {
-		return updateIds(this.currentIds).then(async (ids) => {
+		return updateIds(this.currentIds).then((ids) => {
 			if (!isValidId(id)) {
 				return Promise.reject(new InsightError("id is not valid"));
 			}
@@ -83,9 +85,12 @@ export default class InsightFacade implements IInsightFacade {
 			} else {
 				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-			await unlinkDataset(id);
-			await saveIds(this.currentIds as string[]);
-			return Promise.resolve(id);
+			// return unlinkDataset(id);
+			return;
+		}).then(() => {
+			return saveIds(this.currentIds as string[]).then(() => {
+				return id;
+			});
 		});
 	}
 
@@ -95,7 +100,7 @@ export default class InsightFacade implements IInsightFacade {
 		try {
 			id = checkAndStripId(JSON.stringify(query));
 		} catch (err) {
-			console.log((err as Error).message);
+			// console.log((err as Error).message);
 			return Promise.reject(err);
 		}
 
@@ -104,7 +109,7 @@ export default class InsightFacade implements IInsightFacade {
 				try {
 					validateQuery(query, this.currentDataset.kind);
 				} catch (err) {
-					console.log((err as Error).message);
+					// console.log((err as Error).message);
 					return Promise.reject(err);
 				}
 				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
@@ -117,7 +122,7 @@ export default class InsightFacade implements IInsightFacade {
 						try {
 							validateQuery(query as Query, this.currentDataset.kind);
 						} catch (err) {
-							console.log((err as Error).message);
+							// console.log((err as Error).message);
 							return Promise.reject(err);
 						}
 						return evaluateQuery(this.currentDataset as Dataset, query as Query);
@@ -132,7 +137,7 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 
-	public async listDatasets(): Promise<InsightDataset[]> {
+	public listDatasets(): Promise<InsightDataset[]> {
 		let insightDatasets: InsightDataset[] = [];
 		let promises: any[] = [];
 		return updateIds(this.currentIds)

@@ -33,7 +33,6 @@ export function evaluateQuery(dataset: Dataset, query: Query): InsightResult[] {
 		throw new ResultTooLargeError(results.length + " found sections/rooms");
 	}
 	sortResultsBy(query.OPTIONS.ORDER, results, dataset.id);
-	// console.log(results)
 	return results;
 }
 
@@ -147,10 +146,8 @@ function getField(key: Mkey | Skey): string {
 	throw new Error("Invalid state.");
 }
 function applyTransformation(results: any[], query: Query): InsightResult[] {
-	// 1. Group -> will only have one result per group
 	let groups: Map<string, any> = groupResults(results, query.TRANSFORMATIONS.GROUP);
 
-	// 2. Apply
 	return apply(groups, query.TRANSFORMATIONS.GROUP, query.TRANSFORMATIONS.APPLY);
 }
 

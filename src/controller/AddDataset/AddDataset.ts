@@ -5,6 +5,7 @@ import {parse} from "parse5";
 import {searchNodeTag, getLinks, arrayManipulation, getTableContent,
 	searchNodeAttr, getFullname, getAddressInfo} from "./RoomParsing";
 
+
 export interface Content {
 	result: Result[];
 }
@@ -24,14 +25,14 @@ export interface Result {
 }
 
 export function zipToSectionsDataset(zip: JSZip, id: string): Promise<Dataset> {
-	let [promises, zipContent] = zipToContent(zip);
-	return Promise.all(promises).then(async () => {
+	let promises = zipToContent(zip);
+	return Promise.all(promises).then((contents) => {
 		let sections: Section[] = [];
-		for (const zc of zipContent) {
-			if (zc.content === "") {
+		for (const content of contents) {
+			if (content === "") {
 				continue;
 			}
-			let results: Result[] = (JSON.parse(zc.content) as Content).result;
+			let results: Result[] = (JSON.parse(content) as Content).result;
 			if (results.length > 0) {
 				sections = sections.concat(resultsToSections(id, results));
 			}
@@ -54,29 +55,30 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<Dataset> {
 		if (buildings === null) {
 			return Promise.reject(new InsightError("No directory named campus/discover/buildings-and-classrooms"));
 		}
-		const zipContent: any[] = [];
 		const promises: any[] = [];
-		buildings.forEach(async (relativePath, file) => {
+		const files: any[] = [];
+		buildings.forEach((relativePath, file) => {
 			if (links.includes(file.name)) {
 				const promise = file.async("string");
 				promises.push(promise);
-				zipContent.push({file: relativePath, htmlContent: await promise});
+				files.push(relativePath);
 			}
 		});
-		return Promise.all(promises).then(() => parseRoomData(id, zipContent, links));
+		return Promise.all(promises).then((p) => parseRoomData(id, p, links, files));
 	});
 }
 
-function parseRoomData(id: string, zipContent: any[], links: string[]): Dataset {
+function parseRoomData(id: string, htmlContent: any[], links: string[], files: any[]): Dataset {
+
 	let roomsResult: Room[] = [];
-	let rooms: Room[] = [];
 	let tableContent: any[] = [];
 	let shortname, href, fullname, address: any;
-	for (const zc of zipContent) {
-		if (zc.htmlContent === "") {
+	for (let i = 0; i < htmlContent.length; i++) {
+		const hc = htmlContent[i];
+		if (hc === "") {
 			continue;
 		}
-		let parsedZCContent = parse(zc.htmlContent);
+		let parsedZCContent = parse(hc);
 		let tbodyNode: any[] = searchNodeTag(parsedZCContent, "tbody");
 		if (tbodyNode) {
 			tableContent = arrayManipulation(getTableContent(tbodyNode));
@@ -84,8 +86,8 @@ function parseRoomData(id: string, zipContent: any[], links: string[]): Dataset 
 			if (buildingInfoScope) {
 				fullname = getFullname(buildingInfoScope);
 				address = getAddressInfo(buildingInfoScope);
-				shortname = String(zc.file).substring(0, String(zc.file).length - 4);
-				let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(zc.file));
+				shortname = String(files[i]).substring(0, String(files[i]).length - 4);
+				let index1 = links.indexOf("campus/discover/buildings-and-classrooms/" + String(files[i]));
 				href = "http://students.ubc.ca/" + links[index1];
 			} else {
 				continue;
@@ -104,14 +106,12 @@ function zipToContent(zip: JSZip): any[] {
 	} else {
 		zip = zip.folder("courses") as JSZip;
 	}
-	const zipContent: any[] = [];
 	const promises: any[] = [];
-	zip.forEach(async (relativePath, file) => {
+	zip.forEach((relativePath, file) => {
 		const promise = file.async("string");
 		promises.push(promise);
-		zipContent.push({file: relativePath, content: await promise});
 	});
-	return [promises, zipContent];
+	return promises;
 }
 
 function resultsToRooms(
@@ -122,6 +122,9 @@ function resultsToRooms(
 	let rooms: Room[] = [];
 	for (const content of tableContent) {
 		number = content[0];
+		let temphref = String(href).substring(0, String(href).length - 4);
+		temphref = temphref.slice(0,temphref.lastIndexOf("/")) + "/room" + temphref.slice(temphref.lastIndexOf("/"));
+		let newHref = temphref.concat("-" + number);
 		capacity = parseInt(content[1], 10);
 		furniture = content[2];
 		roomType = content[3];
@@ -134,7 +137,7 @@ function resultsToRooms(
 			[id + "_address"]: address,
 			[id + "_type"]: roomType,
 			[id + "_furniture"]: furniture,
-			[id + "_href"]: href,
+			[id + "_href"]: newHref,
 			[id + "_lat"]: 0,
 			[id + "_lon"]: 0,
 			[id + "_seats"]: capacity

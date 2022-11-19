@@ -54,6 +54,6 @@ describe("PQ", function () {
 
 	it("should AND", async function () {
 		let ir: InsightResult[] = await facade.performQuery(and);
-		expect(ir).to.deep.equal(andResult);
+		expect(ir).to.have.deep.members(andResult);
 	});
 });

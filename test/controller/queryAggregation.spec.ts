@@ -53,7 +53,7 @@ describe("QueryRoomsAndAggregation", function () {
 			// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
-				facade.addDataset("sections", content, InsightDatasetKind.Sections),
+				// facade.addDataset("sections", content, InsightDatasetKind.Sections),
 				facade.addDataset("rooms", roomContent, InsightDatasetKind.Rooms),
 			];
 
@@ -73,7 +73,7 @@ describe("QueryRoomsAndAggregation", function () {
 			"./test/resources/roomQueries",
 			{
 				assertOnResult: (actual, expected) => {
-					expect(actual).to.deep.equal(expected);
+					expect(actual).to.have.deep.members(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
@@ -99,7 +99,7 @@ describe("QueryRoomsAndAggregation", function () {
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
 				facade.addDataset("sections", content, InsightDatasetKind.Sections),
-				facade.addDataset("rooms", roomContent, InsightDatasetKind.Rooms),
+				// facade.addDataset("rooms", roomContent, InsightDatasetKind.Rooms),
 			];
 
 			return Promise.all(loadDatasetPromises);
@@ -118,7 +118,7 @@ describe("QueryRoomsAndAggregation", function () {
 			"./test/resources/aggregationQueries",
 			{
 				assertOnResult: (actual, expected) => {
-					expect(actual).to.deep.equal(expected);
+					expect(actual).to.have.deep.members(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
