@@ -23,12 +23,14 @@ describe("InsightFacade", function () {
 	const datasetContents = new Map<string, string>();
 	let content: string;
 	let roomsContent: string;
+	let subset: string;
 
 	// Reference any datasets you've added to test/resources/archives here and they will
 	// automatically be loaded in the 'before' hook.
 	const datasetsToLoad: {[key: string]: string} = {
 		sections: "./test/resources/archives/pair.zip",
 		rooms: "./test/resources/archives/rooms.zip",
+		subset: "./test/resources/archives/subset.zip",
 	};
 
 	before(function () {
@@ -42,6 +44,7 @@ describe("InsightFacade", function () {
 
 		content = datasetContents.get("sections") ?? "";
 		roomsContent = datasetContents.get("rooms") ?? "";
+		subset = datasetContents.get("subset") ?? "";
 	});
 
 	describe("Add/Remove/List Dataset", function () {
@@ -329,56 +332,42 @@ describe("InsightFacade", function () {
 
 				it("should reject dataset that has not been added yet", async function () {
 					this.timeout(5000);
-					await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 					try {
 						await facade.removeDataset("rooms");
 						expect.fail("Should have rejected!");
 					} catch (err) {
 						expect(err).to.be.instanceOf(NotFoundError);
 					}
-					let insightDatasets = await facade.listDatasets();
-					expect(insightDatasets).to.have.length(1);
 				});
 
 				it("should reject id with underscore", async function () {
 					this.timeout(5000);
-					await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 					try {
 						await facade.removeDataset("sections_1");
 						expect.fail("Should have rejected!");
 					} catch (err) {
 						expect(err).to.be.instanceOf(InsightError);
 					}
-					let insightDatasets = await facade.listDatasets();
-					expect(insightDatasets).to.have.length(1);
 				});
 
 				it("should reject id with only whitespace", async function () {
 					this.timeout(5000);
-					await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 					try {
 						await facade.removeDataset("   ");
 						expect.fail("Should have rejected!");
 					} catch (err) {
 						expect(err).to.be.instanceOf(InsightError);
 					}
-
-					let insightDatasets = await facade.listDatasets();
-					expect(insightDatasets).to.have.length(1);
 				});
 
 				it("should reject blank id", async function () {
 					this.timeout(5000);
-					await facade.addDataset("sections", content, InsightDatasetKind.Sections);
 					try {
 						await facade.removeDataset("");
 						expect.fail("Should have rejected!");
 					} catch (err) {
 						expect(err).to.be.instanceOf(InsightError);
 					}
-
-					let insightDatasets = await facade.listDatasets();
-					expect(insightDatasets).to.have.length(1);
 				});
 			});
 
