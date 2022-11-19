@@ -76,14 +76,27 @@ export function zipToRoomsDataset(zip: JSZip, id: string): Promise<Dataset> {
 		links2 = links;
 		files2 = files;
 		return Promise.all(promises);
-
 	}).then(async (p) => {
 		let dataset: RoomsDataset = parseRoomData(id, p, links2, files2);
+		let toRemove: any[] = [];
 		await Promise.all(dataset.getData().map(async (data) => {
 			let finalGeo: GeoResponse = await getGeolocation(data[id + "_address"] as string);
-			data[id + "_lat"] = finalGeo.lat as number;
-			data[id + "_lon"] = finalGeo.lon as number;
+			if (finalGeo.error) {
+				toRemove.push(data);
+			} else {
+				data[id + "_lat"] = finalGeo.lat as number;
+				data[id + "_lon"] = finalGeo.lon as number;
+			}
 		}));
+		for (const r of toRemove) {
+			let index2 = dataset.getData().indexOf(r);
+			if (index2 !== -1) {
+				dataset.getData().splice(index2, 1);
+			}
+		}
+		if (dataset.getData().length === 0) {
+			return Promise.reject(new InsightError("empty"));
+		}
 		return dataset;
 	});;
 }
