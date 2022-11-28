@@ -4,6 +4,7 @@ import chai, {expect, use} from "chai";
 import chaiHttp from "chai-http";
 import * as fs from "fs-extra";
 import {InsightDatasetKind} from "../../src/controller/IInsightFacade";
+import Controller from "../../src/rest/Controller";
 
 describe("Server", function () {
 
@@ -21,6 +22,8 @@ describe("Server", function () {
 	use(chaiHttp);
 
 	before(function () {
+		facade = Controller.facade;
+
 		server = new Server(4321);
 		server.start().catch(() => {
 			throw new Error("Error starting server");
@@ -40,7 +43,6 @@ describe("Server", function () {
 
 	beforeEach(function () {
 		// might want to add some process logging here to keep track of what"s going on
-		facade = new InsightFacade();
 	});
 
 	afterEach(function () {
@@ -61,19 +63,17 @@ describe("Server", function () {
 				.set("Content-Type", "application/x-zip-compressed")
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(200);
 					expect(res.body["result"]).to.deep.equal(expected);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
-			console.log(err);
+			// console.log(err);
 		}
 	});
 
@@ -89,14 +89,12 @@ describe("Server", function () {
 				.set("Content-Type", "application/x-zip-compressed")
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(400);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -113,15 +111,13 @@ describe("Server", function () {
 				.delete(ENDPOINT_URL)
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(200);
 					expect(res.body["result"]).to.deep.equal(id);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -137,14 +133,12 @@ describe("Server", function () {
 				.delete(ENDPOINT_URL)
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(404);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -160,14 +154,12 @@ describe("Server", function () {
 				.delete(ENDPOINT_URL)
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(400);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -197,15 +189,13 @@ describe("Server", function () {
 				.set("Content-Type", "application/json")
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(200);
 					expect(res.body).to.deep.equal(expected);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -248,14 +238,12 @@ describe("Server", function () {
 				.set("Content-Type", "application/json")
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(400);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -275,8 +263,7 @@ describe("Server", function () {
 				.get(ENDPOINT_URL)
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(200);
 					expect(res.body["result"]).to.deep.equal([
 						{
@@ -288,8 +275,7 @@ describe("Server", function () {
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -305,15 +291,13 @@ describe("Server", function () {
 				.get(ENDPOINT_URL)
 				.then(function (res: ChaiHttp.Response) {
 					// some logging here please!
-					console.log("Response body:");
-					console.log(res.body);
+					logBody(res);
 					expect(res.status).to.be.equal(200);
 					expect(res.body["result"]).to.deep.equal([]);
 				})
 				.catch(function (err) {
 					// some logging here please!
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			// and some more logging here!
@@ -321,3 +305,7 @@ describe("Server", function () {
 		}
 	});
 });
+
+function logBody(res: ChaiHttp.Response) {
+	console.log("\t - response received: ", res.body);
+}

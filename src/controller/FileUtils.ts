@@ -73,9 +73,10 @@ export function saveIds(ids: string[]): Promise<string[]> {
  * @returns
  */
 export function updateIds(ids: string[] | null): Promise<string[]> {
-	if (ids === null) {
-		return loadIds();
-	} else {
-		return Promise.resolve(ids);
-	}
+	return loadIds(); // load ids every time
+	// if (ids === null) {
+	// 	return loadIds();
+	// } else {
+	// 	return Promise.resolve(ids);
+	// }
 }
