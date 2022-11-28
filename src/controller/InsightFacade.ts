@@ -79,9 +79,9 @@ export default class InsightFacade implements IInsightFacade {
 			if (!isValidId(id)) {
 				return Promise.reject(new InsightError("id is not valid"));
 			}
-			if (this.currentIds?.includes(id)) {
-				let index = this.currentIds?.indexOf(id);
-				this.currentIds?.splice(index, 1);
+			if (ids.includes(id)) {
+				let index = ids.indexOf(id);
+				ids.splice(index, 1);
 			} else {
 				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
