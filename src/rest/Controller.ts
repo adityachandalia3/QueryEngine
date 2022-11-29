@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {InsightDatasetKind, InsightError, NotFoundError, ResultTooLargeError} from "../controller/IInsightFacade";
+import {InsightDatasetKind, InsightError, NotFoundError} from "../controller/IInsightFacade";
 import InsightFacade from "../controller/InsightFacade";
 
 export default class Controller {
@@ -44,7 +44,7 @@ export default class Controller {
 			const response = await Controller.facade.listDatasets();
 			res.status(200).json({result: response});
 		} catch (err) {
-			res.status(400).json({error: "unknown"});
+			// res.status(400).json({error: "unknown"});
 		}
 	}
 
