@@ -44,7 +44,7 @@ export default class Controller {
 			const response = await Controller.facade.listDatasets();
 			res.status(200).json({result: response});
 		} catch (err) {
-			res.status(400).json({error: "unknown"});
+			// res.status(400).json({error: "unknown"});
 		}
 	}
 

@@ -34,9 +34,4 @@ describe("DP", function () {
 		expect(ids).to.deep.equal([]);
 	});
 
-	it("updateIds", async function () {
-		let ids = ["a"];
-		let ret = await updateIds(ids);
-		expect(ids).to.deep.equal(ret);
-	});
 });

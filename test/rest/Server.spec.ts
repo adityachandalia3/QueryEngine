@@ -102,6 +102,56 @@ describe("Server", function () {
 		}
 	});
 
+	it("PUT test for courses dataset - 400 status (no base64)", function () {
+		const id: string = "sections";
+		const kind: InsightDatasetKind = InsightDatasetKind.Sections;
+		const ENDPOINT_URL: string = `/dataset/${id}/${kind}`;
+		const ZIP_FILE_DATA: Buffer = pairBuffer;
+		try {
+			return chai.request(SERVER_URL)
+				.put(ENDPOINT_URL)
+				.send(pair64)
+				.set("Content-Type", "application/x-zip-compressed")
+				.then(function (res: ChaiHttp.Response) {
+					// some logging here please!
+					logBody(res);
+					expect(res.status).to.be.equal(400);
+				})
+				.catch(function (err) {
+					// some logging here please!
+					expect.fail(err);
+				});
+		} catch (err) {
+			// and some more logging here!
+			console.log(err);
+		}
+	});
+
+	it("PUT test for courses dataset - 400 status (bad buffer)", function () {
+		const id: string = "sections";
+		const kind: InsightDatasetKind = InsightDatasetKind.Sections;
+		const ENDPOINT_URL: string = `/dataset/${id}/${kind}`;
+		const ZIP_FILE_DATA: Buffer = Buffer.from("bad buffer");
+		try {
+			return chai.request(SERVER_URL)
+				.put(ENDPOINT_URL)
+				.send(ZIP_FILE_DATA)
+				.set("Content-Type", "application/x-zip-compressed")
+				.then(function (res: ChaiHttp.Response) {
+					// some logging here please!
+					logBody(res);
+					expect(res.status).to.be.equal(400);
+				})
+				.catch(function (err) {
+					// some logging here please!
+					expect.fail(err);
+				});
+		} catch (err) {
+			// and some more logging here!
+			console.log(err);
+		}
+	});
+
 	it("DELETE test for courses dataset - 200 status", async () => {
 		const id: string = "sections";
 		const ENDPOINT_URL: string = `/dataset/${id}`;
@@ -146,7 +196,7 @@ describe("Server", function () {
 		}
 	});
 
-	it("DELETE test for courses dataset - 404 status", function () {
+	it("DELETE test for courses dataset - 400 status", function () {
 		const id: string = "_";
 		const ENDPOINT_URL: string = `/dataset/${id}`;
 		try {
@@ -252,6 +302,43 @@ describe("Server", function () {
 	});
 
 
+	it("POST test for query - 400 status no dataset to query", async () => {
+		const ENDPOINT_URL: string = "/query";
+		const expected = {
+			result: [{sections_dept: "adhe", sections_id: "329", sections_avg: 92.54},
+				{sections_dept: "adhe", sections_id: "329", sections_avg: 93.33},
+				{sections_dept: "adhe", sections_id: "329", sections_avg: 96.11}]
+		};
+		const QUERY_JSON_DATA = {
+			WHERE: {OR: [{AND: [{GT: {sections_avg: 92}}, {IS: {sections_dept: "adhe"}}]}]},
+			OPTIONS: {COLUMNS: ["sections_dept", "sections_id", "sections_avg"], ORDER: "sections_avg"}
+		};
+
+		const id = "sections";
+		await facade.addDataset(id, pair64, InsightDatasetKind.Sections);
+		await facade.removeDataset(id);
+
+		try {
+			return chai.request(SERVER_URL)
+				.post(ENDPOINT_URL)
+				.send(QUERY_JSON_DATA)
+				.set("Content-Type", "application/json")
+				.then(async function (res: ChaiHttp.Response) {
+					// some logging here please!
+
+					logBody(res);
+					expect(res.status).to.be.equal(400);
+				})
+				.catch(function (err) {
+					// some logging here please!
+					expect.fail(err);
+				});
+		} catch (err) {
+			// and some more logging here!
+			console.log(err);
+		}
+	});
+
 	it("GET test", async () => {
 		const ENDPOINT_URL: string = "/datasets";
 
@@ -308,4 +395,7 @@ describe("Server", function () {
 
 function logBody(res: ChaiHttp.Response) {
 	console.log("\t - response received: ", res.body);
+	if (res.body.error && typeof res.body.error !== "string") {
+		throw new Error("error must be string");
+	}
 }

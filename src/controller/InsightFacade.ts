@@ -76,17 +76,21 @@ export default class InsightFacade implements IInsightFacade {
 
 	public removeDataset(id: string): Promise<string> {
 		return updateIds(this.currentIds).then((ids) => {
+			this.currentIds = ids;
 			if (!isValidId(id)) {
 				return Promise.reject(new InsightError("id is not valid"));
 			}
 			if (ids.includes(id)) {
 				let index = ids.indexOf(id);
 				ids.splice(index, 1);
+				this.currentIds = ids;
 			} else {
 				return Promise.reject(new NotFoundError("dataset with id not found"));
 			}
-			// return unlinkDataset(id);
-			return;
+			if (this.currentDataset?.id === id) {
+				this.currentDataset = null;
+			}
+			return unlinkDataset(id);
 		}).then(() => {
 			return saveIds(this.currentIds as string[]).then(() => {
 				return id;
@@ -114,7 +118,8 @@ export default class InsightFacade implements IInsightFacade {
 				}
 				return Promise.resolve(evaluateQuery(this.currentDataset as Dataset, query as Query));
 			} else {
-				return updateIds(this.currentIds).then(() => {
+				return updateIds(this.currentIds).then((ids) => {
+					this.currentIds = ids;
 					return loadDataset(id);
 				}).then(
 					(dataset) => {
@@ -142,6 +147,7 @@ export default class InsightFacade implements IInsightFacade {
 		let promises: any[] = [];
 		return updateIds(this.currentIds)
 			.then((ids) => {
+				this.currentIds = ids;
 				for (const id of ids) {
 					promises.push(loadDataset(id));
 				}
