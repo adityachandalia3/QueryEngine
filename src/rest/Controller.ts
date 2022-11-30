@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {InsightDatasetKind, InsightError, NotFoundError, ResultTooLargeError} from "../controller/IInsightFacade";
+import {InsightDatasetKind, InsightError, NotFoundError} from "../controller/IInsightFacade";
 import InsightFacade from "../controller/InsightFacade";
 
 export default class Controller {
