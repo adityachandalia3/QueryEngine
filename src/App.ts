@@ -1,3 +1,6 @@
+import * as fs from "fs-extra";
+import {InsightDatasetKind, InsightError} from "./controller/IInsightFacade";
+import Controller from "./rest/Controller";
 import Server from "./rest/Server";
 
 /**
@@ -21,4 +24,18 @@ console.info("App - starting");
 const app = new App();
 (async () => {
 	await app.initServer(4321);
+})();
+
+// Add dataset for frontend - DOES NOT CLEAR DISK
+(async () => {
+	console.log("Adding starting dataset");
+	try {
+		await Controller.facade.addDataset("sections",
+			fs.readFileSync("src/pair.zip").toString("base64"),
+			InsightDatasetKind.Sections);
+	} catch (err) {
+		if (err instanceof InsightError) {
+			console.log("Warning: disk has not been cleared");
+		}
+	}
 })();

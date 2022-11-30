@@ -1,13 +1,43 @@
-document.getElementById("click-me-button").addEventListener("click", handleClickMe);
+document.getElementById("get-history").addEventListener("click", historyListener);
+document.getElementById("get-courses").addEventListener("click", coursesListener);
 
-function handleClickMe() {
-	alert("Button Clicked!");
-	console.log(getAveragesQuery("cpsc"));
+function historyListener() {
+	let dept = "cpsc";
+	let id = "310";
+
+	const httpRequest = new XMLHttpRequest();
+	httpRequest.onreadystatechange = function () {
+		if (httpRequest.readyState === XMLHttpRequest.DONE) {
+			// Everything is good, the response was received.
+		} else {
+			// Not ready yet.
+		}
+	};
+	httpRequest.open("POST", "http://localhost:4321/query", true);
+	httpRequest.setRequestHeader('Content-Type', 'application/json');
+	httpRequest.send(getHistoryQuery(dept, id));
+
+}
+
+function coursesListener() {
+	let dept = "cpsc";
+
+	const httpRequest = new XMLHttpRequest();
+	httpRequest.onreadystatechange = function () {
+		if (httpRequest.readyState === XMLHttpRequest.DONE) {
+			// Everything is good, the response was received.
+		} else {
+			// Not ready yet.
+		}
+	};
+	httpRequest.open("POST", "http://localhost:4321/query", true);
+	httpRequest.setRequestHeader('Content-Type', 'application/json');
+	httpRequest.send(getAveragesQuery(dept));
 }
 
 // This function returns a JSON query to be used with User Story 2
 // dept: string, id: string
-function getYearlyQuery(dept, id) {
+function getHistoryQuery(dept, id) {
 	return {
 		"WHERE": {
 			"AND": [
