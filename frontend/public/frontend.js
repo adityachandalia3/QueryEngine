@@ -4,19 +4,23 @@ document.getElementById("get-courses").addEventListener("click", coursesListener
 function historyListener() {
 	let dept = "cpsc";
 	let id = "310";
-
 	const httpRequest = new XMLHttpRequest();
 	httpRequest.onreadystatechange = function () {
 		if (httpRequest.readyState === XMLHttpRequest.DONE) {
 			// Everything is good, the response was received.
+			if (httpRequest.status == 200) {
+				console.log("success");
+			} else if (httpRequest.status == 400) {
+				console.log("query rejected");
+			}
 		} else {
 			// Not ready yet.
 		}
 	};
 	httpRequest.open("POST", "http://localhost:4321/query", true);
 	httpRequest.setRequestHeader('Content-Type', 'application/json');
-	httpRequest.send(getHistoryQuery(dept, id));
-
+	console.log("sending http request");
+	httpRequest.send(JSON.stringify(getHistoryQuery(dept, id)));
 }
 
 function coursesListener() {
@@ -26,13 +30,18 @@ function coursesListener() {
 	httpRequest.onreadystatechange = function () {
 		if (httpRequest.readyState === XMLHttpRequest.DONE) {
 			// Everything is good, the response was received.
+			if (httpRequest.status == 200) {
+				console.log("success");
+			} else if (httpRequest.status == 400) {
+				console.log("query rejected");
+			}
 		} else {
 			// Not ready yet.
 		}
 	};
 	httpRequest.open("POST", "http://localhost:4321/query", true);
 	httpRequest.setRequestHeader('Content-Type', 'application/json');
-	httpRequest.send(getAveragesQuery(dept));
+	httpRequest.send(JSON.stringify({}));
 }
 
 // This function returns a JSON query to be used with User Story 2
