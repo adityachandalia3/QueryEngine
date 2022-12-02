@@ -6,9 +6,30 @@
 		<link href="/style.css" rel="stylesheet" />
 	</head>
 	<body>
+		<form>
+			<label for="history">Department and ID:</label><br>
+			<input type="text" id="history" name="history" value="cpsc 310"><br>
+		  </form>
 		<button id="get-history" class="button" >Get History</button>
+		<form>
+			<label for="averages">Department:</label><br>
+			<input type="text" id="averages" name="averages" value="cpsc"><br>
+		  </form>
 		<button id="get-courses" class="button" >Get Courses with Highest Averages</button>
-
+		  <div id="output">
+			  <table id="coursesOutput">
+				  <tr>
+					  <th>Section title</th>
+					  <th>Section ID</th>
+					  <th>Overall Avg</th>
+				  </tr>
+				  <tr>
+					  <td id="section_title"> </td>
+					  <td id="section_id"> </td>
+					  <td id="overallAvg"></td>
+				  </tr>
+			  </table>
+		  </div>
 		<script type="text/javascript" src="/frontend.js"></script>
 	</body>
 </html>

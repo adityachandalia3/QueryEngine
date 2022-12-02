@@ -1,58 +1,80 @@
-document.getElementById("get-history").addEventListener("click", historyListener);
 document.getElementById("get-courses").addEventListener("click", coursesListener);
-
-function historyListener() {
-	let dept = "cpsc";
-	let id = "310";
-
-	const httpRequest = new XMLHttpRequest();
-	httpRequest.onreadystatechange = function () {
-		if (httpRequest.readyState === XMLHttpRequest.DONE) {
-			// Everything is good, the response was received.
-		} else {
-			// Not ready yet.
-		}
-	};
-	httpRequest.open("POST", "http://localhost:4321/query", true);
-	httpRequest.setRequestHeader('Content-Type', 'application/json');
-	httpRequest.send(getHistoryQuery(dept, id));
-
-}
+document.getElementById("get-history").addEventListener("click", historyListener);
 
 function coursesListener() {
-	let dept = "cpsc";
-
+	let dept = document.getElementById("averages").value;
+	console.log(dept);
 	const httpRequest = new XMLHttpRequest();
 	httpRequest.onreadystatechange = function () {
 		if (httpRequest.readyState === XMLHttpRequest.DONE) {
 			// Everything is good, the response was received.
-		} else {
-			// Not ready yet.
+			if (httpRequest.status == 200) {
+				console.log("success");
+				/*The application presents the title,
+				id, and overall average of ten courses,
+				or less if less than ten courses exist,
+				from the chosen department with the highest averages in descending order.
+				*/
+
+				let data = JSON.parse(httpRequest.responseText);
+				let id = [];
+				let title = [];
+				let avg = [];
+				let result = []
+				for (const obj of data.result){
+					let Obj = {
+						Section: obj.sections_id,
+						Avg: obj.overallAvg,
+					};
+					result.push(Obj);
+
+				}
+
+				for (const content of result){
+
+				}
+				document.getElementById("output").innerHTML = result;
+
+
+
+
+				// If result is empty
+				// document.getElementById("output").innerHTML = "Invalid department";
+
+
+			} else if (httpRequest.status == 400) {
+				// should not reject
+				console.log("query rejected");
+			}
 		}
 	};
 	httpRequest.open("POST", "http://localhost:4321/query", true);
 	httpRequest.setRequestHeader('Content-Type', 'application/json');
-	httpRequest.send(getAveragesQuery(dept));
+	httpRequest.send(JSON.stringify(getAveragesQuery(dept)));
 }
 
-// This function returns a JSON query to be used with User Story 2
-// dept: string, id: string
-function getHistoryQuery(dept, id) {
-	return {
-		"WHERE": {
-			"AND": [
-				{ "IS": { "sections_dept": dept } },
-				{ "IS": { "sections_id": id } }
-			]
-		},
-		"OPTIONS": {
-			"COLUMNS": ["average", "sections_year"],
-			"ORDER": { "dir": "DOWN", "keys": ["sections_year"] } },
-			"TRANSFORMATIONS": {
-				"APPLY": [{ "average": { "AVG": "sections_avg" } }],
-				"GROUP": ["sections_year"]
+function historyListener() {
+	let values = String(document.getElementById("history").value).split(" ");
+	let dept = values[0];
+	let id = values[1];
+	const httpRequest = new XMLHttpRequest();
+	httpRequest.onreadystatechange = function () {
+		if (httpRequest.readyState === XMLHttpRequest.DONE) {
+			// Everything is good, the response was received.
+			if (httpRequest.status == 200) {
+				console.log("success");
+				// The application presents the title, id, year, and yearly average of each course in order of year.
+				document.getElementById("output").innerHTML = "TODO: display result here";
+			} else if (httpRequest.status == 400) {
+				console.log("query rejected");
+				document.getElementById("output").innerHTML = "Invalid department and id";
 			}
-	}
+		}
+	};
+	httpRequest.open("POST", "http://localhost:4321/query", true);
+	httpRequest.setRequestHeader('Content-Type', 'application/json');
+	console.log("sending http request");
+	httpRequest.send(JSON.stringify(getHistoryQuery(dept, id)));
 }
 
 // This function returns a JSON Query to be used with User Story 1
@@ -92,3 +114,27 @@ function getAveragesQuery(dept) {
 		}
 	};
 }
+
+// This function returns a JSON query to be used with User Story 2
+// dept: string, id: string
+function getHistoryQuery(dept, id) {
+	return {
+		"WHERE": {
+			"AND": [
+				{ "IS": { "sections_dept": dept } },
+				{ "IS": { "sections_id": id } }
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["average", "sections_year"],
+			"ORDER": { "dir": "DOWN", "keys": ["sections_year"] } },
+			"TRANSFORMATIONS": {
+				"APPLY": [{ "average": { "AVG": "sections_avg" } }],
+				"GROUP": ["sections_year"]
+			}
+	}
+}
+
+
+
+
