@@ -100,6 +100,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		let id: string;
+		console.log("beginning run");
 
 		try {
 			id = checkAndStripId(JSON.stringify(query));

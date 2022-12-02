@@ -45,10 +45,10 @@ function getHistoryQuery(dept, id) {
 				{ "IS": { "sections_id": id } }
 			]
 		},
-		"OPTIONS": { 
+		"OPTIONS": {
 			"COLUMNS": ["average", "sections_year"],
 			"ORDER": { "dir": "DOWN", "keys": ["sections_year"] } },
-			"TRANSFORMATIONS": { 
+			"TRANSFORMATIONS": {
 				"APPLY": [{ "average": { "AVG": "sections_avg" } }],
 				"GROUP": ["sections_year"]
 			}
