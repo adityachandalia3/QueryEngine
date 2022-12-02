@@ -15,36 +15,37 @@ function coursesListener() {
 				or less if less than ten courses exist,
 				from the chosen department with the highest averages in descending order.
 				*/
-
-				let data = JSON.parse(httpRequest.responseText);
-				let id = [];
-				let title = [];
-				let avg = [];
-				let result = []
-				for (const obj of data.result){
-					let Obj = {
-						Section: obj.sections_id,
-						Avg: obj.overallAvg,
-					};
-					result.push(Obj);
-
+				let result = JSON.parse(httpRequest.responseText).result;
+				table = document.createElement("table");
+				row = table.insertRow(0);
+				title   = row.insertCell(0);
+				id      = row.insertCell(1);
+				average = row.insertCell(2);
+				title.innerHTML = "Title";
+				id.innerHTML = "ID";
+				average.innerHTML = "Average";
+				for (let i = 0; i < 10 && i < result.length; i++) {
+					row = table.insertRow(-1);
+					title   = row.insertCell(0);
+					id      = row.insertCell(1);
+					average = row.insertCell(2);
+					title.innerHTML = result[i].sections_title;
+					id.innerHTML = result[i].sections_id;
+					average.innerHTML = result[i].overallAvg;
 				}
 
-				for (const content of result){
-
+				if (result.length == 0) {
+					table = document.createElement("span");
+					table.innerHTML = "Invalid department";
 				}
-				document.getElementById("output").innerHTML = result;
-
-
-
-
-				// If result is empty
-				// document.getElementById("output").innerHTML = "Invalid department";
-
-
+				
+				oldChild = document.getElementById("output").firstChild;
+				document.getElementById("output").replaceChild(table, oldChild);
 			} else if (httpRequest.status == 400) {
-				// should not reject
-				console.log("query rejected");
+				errorMsg = document.createElement("span");
+				errorMsg.innerHTML = "Invalid department";
+				oldChild = document.getElementById("output").firstChild;
+				document.getElementById("output").replaceChild(errorMsg, oldChild);
 			}
 		}
 	};
@@ -55,8 +56,8 @@ function coursesListener() {
 
 function historyListener() {
 	let values = String(document.getElementById("history").value).split(" ");
-	let dept = values[0];
-	let id = values[1];
+	let _dept = values[0];
+	let _id = values[1];
 	const httpRequest = new XMLHttpRequest();
 	httpRequest.onreadystatechange = function () {
 		if (httpRequest.readyState === XMLHttpRequest.DONE) {
@@ -64,17 +65,48 @@ function historyListener() {
 			if (httpRequest.status == 200) {
 				console.log("success");
 				// The application presents the title, id, year, and yearly average of each course in order of year.
-				document.getElementById("output").innerHTML = "TODO: display result here";
+				let result = JSON.parse(httpRequest.responseText).result;
+				table = document.createElement("table");
+				row = table.insertRow(0);
+				title   = row.insertCell(0);
+				id      = row.insertCell(1);
+				year      = row.insertCell(2);
+				average = row.insertCell(3);
+				title.innerHTML = "Title";
+				id.innerHTML = "ID";
+				year.innerHTML = "Year";
+				average.innerHTML = "Average";
+				for (let i = 0; i < result.length; i++) {
+					row = table.insertRow(-1);
+					title   = row.insertCell(0);
+					id      = row.insertCell(1);
+					year    = row.insertCell(2);
+					average = row.insertCell(3);
+					title.innerHTML = _dept;
+					id.innerHTML = _id;
+					year.innerHTML = result[i].sections_year;
+					average.innerHTML = result[i].average;
+				}
+
+				if (result.length == 0) {
+					table = document.createElement("span");
+					table.innerHTML = "Invalid department and id";
+				}
+
+				oldChild = document.getElementById("output").firstChild;
+				document.getElementById("output").replaceChild(table, oldChild);
 			} else if (httpRequest.status == 400) {
-				console.log("query rejected");
-				document.getElementById("output").innerHTML = "Invalid department and id";
+				errorMsg = document.createElement("span");
+				errorMsg.innerHTML = "Invalid department and id";
+				oldChild = document.getElementById("output").firstChild;
+				document.getElementById("output").replaceChild(errorMsg, oldChild);
 			}
 		}
 	};
 	httpRequest.open("POST", "http://localhost:4321/query", true);
 	httpRequest.setRequestHeader('Content-Type', 'application/json');
 	console.log("sending http request");
-	httpRequest.send(JSON.stringify(getHistoryQuery(dept, id)));
+	httpRequest.send(JSON.stringify(getHistoryQuery(_dept, _id)));
 }
 
 // This function returns a JSON Query to be used with User Story 1
