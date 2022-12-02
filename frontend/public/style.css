@@ -1,3 +1,18 @@
+body {
+	padding-left: 20px;
+}
+
+td {
+	padding: 10px;
+	width: 120px;
+}
+
+form {
+	margin-top: 10px;
+	padding-top: 10px;
+	display: inline-block;
+}
+
 .button {
 	background-color: #3f51b5;
 	border: none;
@@ -7,8 +22,14 @@
 	text-decoration: none;
 	display: inline-block;
 	font-size: 16px;
+	margin: 10px;
+	margin-right: 200px;
 }
 
 .button:hover {
 	cursor: pointer;
+}
+
+#output {
+	padding-top: 40px;
 }
